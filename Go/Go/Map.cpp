@@ -67,7 +67,9 @@ void map::MoveStone(const int& PrevX_coord, const int& PrevY_coord,
 
 const char& map::GetCell(const int& x_coord, const int& y_coord) const
 {
-	return field[x_coord][y_coord];
+	if ((x_coord >= 0 && x_coord < width) && (y_coord >= 0 && y_coord < height))
+		return field[x_coord][y_coord];
+	return 0;
 }
 
 void map::ResetField()

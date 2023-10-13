@@ -1,17 +1,13 @@
 ﻿#include "GameController.h"
-#include <conio.h>
 #include <iostream>
-#include <Windows.h>
+#include <conio.h>
 
 gameController::gameController(const unsigned int& x, const unsigned int& y):
-	width(x), height(y), gameMap(width, height), isDead(false),
-	complete(false), blackMove(true)
+	width(x), height(y), gameMap(width, height), complete(false), blackMove(true)
 {}
 
 void gameController::PlayerMove()
 {
-	unsigned int x = 0, y = 0;
-
 	while (true)
 	{
 		system("cls");
@@ -58,138 +54,126 @@ void gameController::PlayerMove()
 
 void gameController::PlayerMove(const bool setStone)
 {
-	unsigned int x = 0, y = 0, prevX_coord = 0, prevY_coord = 0;
+	int x = 0, y = 0, prevX_coord = 0, prevY_coord = 0;
 	if (setStone)
 	{
 		std::cout << "Введите строку и столбец" << '\n';
-		std::cin >> x;	
-		std::cin >> y;
+		std::cin >> x >> y;
+		CheckInputValidation(x, y);
 
-		if (gameMap.EmptyCheck(x - 1, y - 1))
-		{
-			gameMap.SetStone(x - 1, y - 1, DefineMove());
-			Update(x - 1, y - 1);
+		gameMap.SetStone(x - 1, y - 1, DefineMove());
+		Update(x - 1, y - 1);
 
-			blackMove = !blackMove;
-		}
-		else
-		{
-			system("cls");
-
-			TextModeOutput();
-			std::cout << "Введите заново строку и столбец" << '\n';
-			std::cin >> x;
-			std::cin >> y;
-		}
+		blackMove = !blackMove;
 	}
 	else
 	{
 		std::cout << "Введите предыдущюю строку и столбец" << '\n';
-		std::cin >> prevX_coord;
-		std::cin >> prevY_coord;
+		std::cin >> prevX_coord >> prevY_coord;
+		CheckInputValidation(prevX_coord, prevY_coord);
 
+		system("cls");
+		TextModeOutput();
 		std::cout << "Введите строку и столбец" << '\n';
-		std::cin >> x;
-		std::cin >> y;
+		std::cin >> x >> y;
+		CheckInputValidation(prevX_coord, prevY_coord, x, y);
 
-		if (gameMap.GetCell(prevX_coord - 1, prevY_coord - 1) == DefineMove()
-			&& gameMap.EmptyCheck(x - 1, y - 1))
-		{
-			gameMap.MoveStone(prevX_coord - 1, prevY_coord - 1, x - 1, y - 1);
-			Update(x - 1, y - 1);
+		gameMap.MoveStone(prevX_coord - 1, prevY_coord - 1, x - 1, y - 1);
+		Update(x - 1, y - 1);
 
-			blackMove = !blackMove;
-		}
-		else
-		{
-			system("cls");
-
-			TextModeOutput();
-			std::cout << "Введите заново строку и столбец" << '\n';
-			std::cin >> x;
-			std::cin >> y;
-		}
+		blackMove = !blackMove;
 	}
 }
 
 int gameController::Update(const int& x_elem, const int& y_elem)
 {
-	//if ((x_elem >= 0 && x_elem < width) && (y_elem >= 0 && y_elem < height))
-	//{
-	//	Update(x_elem - 1, y_elem + 1, 1);
-	//	Update(x_elem, y_elem + 1, 1);
-	//	Update(x_elem + 1, y_elem + 1, 1);
-
-	//	Update(x_elem - 1, y_elem, 1);
-	//	//Update(x_elem, y_elem, 1);
-	//	Update(x_elem + 1, y_elem, 1);
-
-	//	Update(x_elem - 1, y_elem - 1, 1);
-	//	Update(x_elem, y_elem - 1, 1);
-	//	Update(x_elem + 1, y_elem - 1, 1);
-	//}
+	playersScore[0] = 0; playersScore[1] = 0;
 	for (int i = 0; i < width; i++) // по столбцу
 	{
-		int lenColumn = 0;
+		int lenColumnBl = 0;
+		int lenColumnWh = 0;
 		for (int j = 0; j < height; j++)
 		{
-			if (gameMap.GetCell(i, j) == DefineMove())
-				lenColumn++;
+			if (gameMap.GetCell(i, j) == 'b')
+				lenColumnBl++;
+			else
+				lenColumnBl = 0;
+
+			if (gameMap.GetCell(i, j) == 'w')
+				lenColumnWh++;
+			else
+				lenColumnWh = 0;
 		}
 
-		if (lenColumn == 5)
-		{
-			if (blackMove)
-				playersScore[0]++;
-			else
-				playersScore[1]++;
-		}
+		if (lenColumnBl == 5)
+			playersScore[0]++;
+
+		if (lenColumnWh == 5)
+			playersScore[1]++;
 	}
 
 	for (int j = 0; j < width; j++) // По строкам
 	{
-		int lenRow = 0;
+		int lenRowBl = 0;
+		int lenRowWh = 0;
 		for (int i = 0; i < height; i++)
 		{
-			if (gameMap.GetCell(i, j) == DefineMove())
-				lenRow++;
+			if (gameMap.GetCell(i, j) == 'b')
+				lenRowBl++;
+			else
+				lenRowBl = 0;
+
+			if (gameMap.GetCell(i, j) == 'w')
+				lenRowWh++;
+			else
+				lenRowWh = 0;
 		}
 
-		if (lenRow == 5)
-		{
-			if (blackMove)
-				playersScore[0]++;
-			else
-				playersScore[1]++;
-		}
+		if (lenRowBl == 5)
+			playersScore[0]++;
+
+		if (lenRowWh == 5)
+			playersScore[1]++;
 	}
 
-	for (int i = 0, lenDiagonal = 0; i < width; i++) // Главная диагональ
+	for (int i = 0, lenDiagonalBl = 0, lenDiagonalWh = 0; i < width; i++) // Главная диагональ
 	{
-		if (gameMap.GetCell(i, i) == DefineMove())
-			lenDiagonal++;
+		if (gameMap.GetCell(i, i) == 'b')
+			lenDiagonalBl++;
+		else
+			lenDiagonalBl = 0;
 
-		if (lenDiagonal == 5)
-		{
-			if (blackMove)
-				playersScore[0]++;
-			else
-				playersScore[1]++;
-		}
+		if (gameMap.GetCell(i, i) == 'w')
+			lenDiagonalWh++;
+		else
+			lenDiagonalWh = 0;
+
+
+		if (lenDiagonalBl == 5)
+			playersScore[0]++;
+
+		if (lenDiagonalWh == 5)
+			playersScore[1]++;
 	}
 
-	for (int i = width - 1, lenSideDiagonal = 0; i >= 0; i--) // Побочная диагональ
+	for (int i = width - 1, 
+		lenSideDiagBl = 0, lenSideDiagWh = 0; i >= 0; i--) // Побочная диагональ
 	{
-		if (gameMap.GetCell(i, (width - 1) - i) == DefineMove())
-			lenSideDiagonal++;
+		if (gameMap.GetCell(i, (width - 1) - i) == 'b')
+			lenSideDiagBl++;
+		else
+			lenSideDiagBl = 0;
 
-		if (lenSideDiagonal == 5)
-		{
-			if (blackMove)
-				playersScore[0]++;
-			else
-				playersScore[1]++;
-		}
+		if (gameMap.GetCell(i, (width - 1) - i) == 'w')
+			lenSideDiagWh++;
+		else
+			lenSideDiagWh = 0;
+
+		if (lenSideDiagBl == 5)
+			playersScore[0]++;
+
+		if (lenSideDiagWh == 5)
+			playersScore[1]++;
 	}
 
 	for (int i = 0; i < 2; i++)
@@ -207,7 +191,6 @@ char gameController::DefineMove()
 
 void gameController::Restart()
 {
-	isDead = false;
 	blackMove = true;
 
 	gameMap.ResetField();
@@ -239,32 +222,59 @@ void gameController::TextModeOutput()
 	}
 }
 
-//void gameController::Update(const int& x_elem, const int& y_elem, int line)
-//{
-//	if (line == 5)
-//	{
-//		if (blackMove)
-//			playersScore[0]++;
-//		else
-//			playersScore[1]++;
-//		return;
-//	}
-//
-//	if ((x_elem >= 0 && x_elem < width) && (y_elem >= 0 && y_elem < height))
-//	{
-//		if (gameMap.GetCell(x_elem,y_elem) == DefineMove())
-//		{
-//			Update(x_elem - 1, y_elem + 1, line + 1);
-//			Update(x_elem, y_elem + 1, line + 1);
-//			Update(x_elem + 1, y_elem + 1, line + 1);
-//
-//			Update(x_elem - 1, y_elem, line + 1);
-//			//Update(x_elem, y_elem, line + 1);
-//			Update(x_elem + 1, y_elem, line + 1);
-//
-//			Update(x_elem - 1, y_elem - 1, line + 1);
-//			Update(x_elem, y_elem - 1, line + 1);
-//			Update(x_elem + 1, y_elem - 1, line + 1);
-//		}
-//	}
-//}
+void gameController::CheckInputValidation(int& x, int& y)
+{
+	while (std::cin.fail() 
+		|| !gameMap.GetCell(x - 1, y - 1)
+		|| !gameMap.EmptyCheck(x - 1, y - 1))
+	{
+		system("cls");
+		std::cin.clear();
+		std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
+		TextModeOutput();
+		std::cout << "An error has occuried" << '\n' 
+			<< "Введите заново строку и столбец" << '\n';
+		std::cin >> x >> y;
+	}
+}
+
+void gameController::CheckInputValidation(int& prevX_coord, int& prevY_coord,
+	int& x_coord, int& y_coord)
+{
+	while (std::cin.fail() 
+		|| gameMap.GetCell(prevX_coord - 1, prevY_coord - 1) != DefineMove()
+		|| !gameMap.EmptyCheck(x_coord - 1, y_coord - 1))
+	{
+		system("cls");
+		std::cin.clear();
+		std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
+		if (gameMap.GetCell(prevX_coord - 1, prevY_coord - 1) != DefineMove())
+		{
+			TextModeOutput();
+			std::cout << "An error has occuried" << '\n'
+				<< "Введите заново предыдущую строку и столбец элемента" << '\n';
+			std::cin >> prevX_coord >> prevY_coord;
+		}
+
+		if (!gameMap.EmptyCheck(x_coord - 1, y_coord - 1))
+		{
+			TextModeOutput();
+			std::cout << "An error has occuried" << '\n'
+				<< "Введите заново строку и столбец в перемещяемый элемент" << '\n';
+			std::cin >> x_coord >> y_coord;
+		}
+	}
+}
+
+int gameController::EvaluationFunc()
+{
+	int evaluation = playersScore[1] - playersScore[0];
+
+	if (playersScore[1] == 10)
+		evaluation += 100;
+
+	if (playersScore[0] == 10)
+		evaluation -= 100;
+
+	return evaluation;
+}
