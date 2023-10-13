@@ -1,5 +1,6 @@
 #pragma once
 #include "Map.h"
+#include "List.h"
 
 class gameController
 {
@@ -9,11 +10,12 @@ private:
 	bool complete;
 	bool blackMove;
 
+	list playersHistory[2];
 	map gameMap;
 
 	void PlayerMove(const bool setStone);
-	int Update(const int& x_elem, const int& y_elem);
-	void Update(const int& x_elem, const int& y_elem, int line);
+	int Update();
+	bool FindHistoryComb(const point& beg, const point& end);
 	char DefineMove();
 
 	int EvaluationFunc();

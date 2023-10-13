@@ -1,4 +1,5 @@
 ﻿#include "GameController.h"
+#include "Point.h"
 #include <iostream>
 #include <conio.h>
 
@@ -62,9 +63,9 @@ void gameController::PlayerMove(const bool setStone)
 		CheckInputValidation(x, y);
 
 		gameMap.SetStone(x - 1, y - 1, DefineMove());
-		Update(x - 1, y - 1);
+		Update();
 
-		blackMove = !blackMove;
+		//blackMove = !blackMove;
 	}
 	else
 	{
@@ -79,107 +80,170 @@ void gameController::PlayerMove(const bool setStone)
 		CheckInputValidation(prevX_coord, prevY_coord, x, y);
 
 		gameMap.MoveStone(prevX_coord - 1, prevY_coord - 1, x - 1, y - 1);
-		Update(x - 1, y - 1);
+		Update();
 
-		blackMove = !blackMove;
+		//blackMove = !blackMove;
 	}
 }
 
-int gameController::Update(const int& x_elem, const int& y_elem)
+int gameController::Update()
 {
-	playersScore[0] = 0; playersScore[1] = 0;
-	for (int i = 0; i < width; i++) // по столбцу
+	for (int i = 0; i < width; i++) // по строке
 	{
-		int lenColumnBl = 0;
-		int lenColumnWh = 0;
+		int lenRow = 0; point beg, end;
+		bool begOfSeries = true;
 		for (int j = 0; j < height; j++)
 		{
-			if (gameMap.GetCell(i, j) == 'b')
-				lenColumnBl++;
+			if (gameMap.GetCell(i, j) == DefineMove())
+			{
+				if (begOfSeries)
+				{
+					beg.SetPoint(i, j);
+					begOfSeries = false;
+				}
+				lenRow++;
+				end.SetPoint(i, j);
+			}	
 			else
-				lenColumnBl = 0;
-
-			if (gameMap.GetCell(i, j) == 'w')
-				lenColumnWh++;
-			else
-				lenColumnWh = 0;
+			{
+				lenRow = 0; begOfSeries = true;
+				beg.SetPoint(0, 0); end.SetPoint(0, 0);
+			}	
 		}
 
-		if (lenColumnBl == 5)
-			playersScore[0]++;
-
-		if (lenColumnWh == 5)
-			playersScore[1]++;
+		if (lenRow == 5)
+		{
+			if (blackMove && !FindHistoryComb(beg, end))
+			{
+				playersScore[0]++; playersHistory[0].PushForward(beg, end);
+			}	
+			else if (!FindHistoryComb(beg, end))
+			{
+				playersScore[1]++; playersHistory[1].PushForward(beg, end);
+			}	
+		}
 	}
 
-	for (int j = 0; j < width; j++) // По строкам
+	for (int j = 0; j < width; j++) // По столбцу
 	{
-		int lenRowBl = 0;
-		int lenRowWh = 0;
+		int lenColumn = 0; point beg, end;
+		bool begOfSeries = true;
 		for (int i = 0; i < height; i++)
 		{
-			if (gameMap.GetCell(i, j) == 'b')
-				lenRowBl++;
+			if (gameMap.GetCell(i, j) == DefineMove())
+			{
+				if (begOfSeries)
+				{
+					beg.SetPoint(i, j);
+					begOfSeries = false;
+				}
+				lenColumn++;
+				end.SetPoint(i, j);
+			}
 			else
-				lenRowBl = 0;
-
-			if (gameMap.GetCell(i, j) == 'w')
-				lenRowWh++;
-			else
-				lenRowWh = 0;
+			{
+				begOfSeries = true; lenColumn = 0;
+				beg.SetPoint(0, 0); end.SetPoint(0, 0);
+			}
+				
 		}
 
-		if (lenRowBl == 5)
-			playersScore[0]++;
-
-		if (lenRowWh == 5)
-			playersScore[1]++;
+		if (lenColumn == 5)
+		{
+			if (blackMove && !FindHistoryComb(beg, end))
+			{
+				playersScore[0]++; playersHistory[0].PushForward(beg, end);
+			}
+			else if (!FindHistoryComb(beg, end))
+			{
+				playersScore[1]++; playersHistory[1].PushForward(beg, end);
+			}
+		}
 	}
 
-	for (int i = 0, lenDiagonalBl = 0, lenDiagonalWh = 0; i < width; i++) // Главная диагональ
+	for (int i = 0, lenDiagonal = 0; i < width; i++) // Главная диагональ
 	{
-		if (gameMap.GetCell(i, i) == 'b')
-			lenDiagonalBl++;
+		point beg, end;
+		bool begOfSeries = true;
+		if (gameMap.GetCell(i, i) == DefineMove())
+		{
+			if (begOfSeries)
+			{
+				beg.SetPoint(i, i);
+				begOfSeries = false;
+			}
+			lenDiagonal++;
+			end.SetPoint(i, i);
+		}
 		else
-			lenDiagonalBl = 0;
+		{
+			lenDiagonal = 0; begOfSeries = true;
+			beg.SetPoint(0, 0); end.SetPoint(0, 0);
+		}
 
-		if (gameMap.GetCell(i, i) == 'w')
-			lenDiagonalWh++;
-		else
-			lenDiagonalWh = 0;
-
-
-		if (lenDiagonalBl == 5)
-			playersScore[0]++;
-
-		if (lenDiagonalWh == 5)
-			playersScore[1]++;
+		if (lenDiagonal == 5)
+		{
+			if (blackMove && !FindHistoryComb(beg, end))
+			{
+				playersScore[0]++; playersHistory[0].PushForward(beg, end);
+			}
+			else if (!FindHistoryComb(beg, end))
+			{
+				playersScore[1]++; playersHistory[1].PushForward(beg, end);
+			}
+		}
 	}
 
-	for (int i = width - 1, 
-		lenSideDiagBl = 0, lenSideDiagWh = 0; i >= 0; i--) // Побочная диагональ
+	for (int i = width - 1, lenSideDiagonal = 0; i >= 0; i--) // Побочная диагональ
 	{
-		if (gameMap.GetCell(i, (width - 1) - i) == 'b')
-			lenSideDiagBl++;
+		point beg, end;
+		bool begOfSeries = true;
+		if (gameMap.GetCell(i, (width - 1) - i) == DefineMove())
+		{
+			if (begOfSeries)
+			{
+				beg.SetPoint(i, (width - 1) - i);
+				begOfSeries = false;
+			}
+			lenSideDiagonal++;
+			end.SetPoint(i, (width - 1) - i);
+		}
 		else
-			lenSideDiagBl = 0;
+		{
+			lenSideDiagonal = 0; begOfSeries = true;
+			beg.SetPoint(0, 0); end.SetPoint(0, 0);
+		}
 
-		if (gameMap.GetCell(i, (width - 1) - i) == 'w')
-			lenSideDiagWh++;
-		else
-			lenSideDiagWh = 0;
-
-		if (lenSideDiagBl == 5)
-			playersScore[0]++;
-
-		if (lenSideDiagWh == 5)
-			playersScore[1]++;
+		if (lenSideDiagonal == 5)
+		{
+			if (blackMove && !FindHistoryComb(beg, end))
+			{
+				playersScore[0]++; playersHistory[0].PushForward(beg, end);
+			}
+			else if (!FindHistoryComb(beg, end))
+			{
+				playersScore[1]++; playersHistory[1].PushForward(beg, end);
+			}
+		}
 	}
 
 	for (int i = 0; i < 2; i++)
 		if (playersScore[i] == 10)
 			complete = true;
 	return 0;
+}
+
+bool gameController::FindHistoryComb(const point& beg, const point& end)
+{
+	if (blackMove)
+		for (int i = 0; i < playersHistory[0].GetCountOfElements(); i++)
+			if (playersHistory[0][i][0] == beg && playersHistory[0][i][1] == end)
+				return true;
+	else
+		for (int i = 0; i < playersHistory[1].GetCountOfElements(); i++)
+			if (playersHistory[1][i][0] == beg && playersHistory[1][i][1] == end)
+				return true;
+	return false;
 }
 
 char gameController::DefineMove()
@@ -194,15 +258,19 @@ void gameController::Restart()
 	blackMove = true;
 
 	gameMap.ResetField();
+	
 	for (auto i = 0; i < 2; i++)
-		usedStone[i] = 0;
+	{
+		usedStone[i] = 0; playersScore[i] = 0;
+		playersHistory[i].Clear();
+	}	
 }
 
 void gameController::TextModeOutput()
 {
 	std::cout << "Очки " << playersScore[0] << " - Черные фишки, "
 		<< playersScore[1] << " - белые фишки\n";
-
+	playersHistory[0].Print();
 	std::cout << "  ";
 	for (int i = 1; i <= height; i++)
 	{
