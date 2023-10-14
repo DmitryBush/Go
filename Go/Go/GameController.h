@@ -1,6 +1,7 @@
 #pragma once
 #include "Map.h"
 #include "List.h"
+#include <string>
 
 class gameController
 {
@@ -17,9 +18,8 @@ private:
 	int Update();
 	bool FindHistoryComb(const point& beg, const point& end);
 	char DefineMove();
-	int EvaluationFunc(std::string position);
 
-	int EvaluationFunc();
+	int EvaluationFunc(const std::string position);
 
 	void CheckInputValidation(int& x, int& y);
 	void CheckInputValidation(int& prevX_coord, int& prevY_coord,

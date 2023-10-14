@@ -334,49 +334,23 @@ void gameController::CheckInputValidation(int& prevX_coord, int& prevY_coord,
 	}
 }
 
-int gameController::EvaluationFunc(std::string position)
+int gameController::EvaluationFunc(const std::string position)
 {
-	int evaluation = playersScore[1] - playersScore[0];
-
-	if (position == "0wwwww" || position == "wwwww0")
-	{
-		return evaluation + 100000000;
-	}
-	else if (position == "0www00" || position == "00www0")
-	{
-		return evaluation + 10000000;
-	}
-	else if (position == "0wwwwb" || position == "bwwww0")
-	{
-		return evaluation + 1000000;
-	}
-	else if (position == "00www0" || position == "www000" 
-		|| position == "0www00" || position == "000www")
-	{
-		return evaluation + 100000;
-	}
-	else if (position == "00wwwb" || position == "wwwb00" || position == "0wwwb0"
-		|| position == "0bwww0" || position == "bwww00")
-	{
-		return evaluation + 10000;
-	}
-	else if (position == "ww0000" || position == "0ww000" || position == "00ww00"
-		|| position == "0000ww")
-	{
-		return evaluation + 1000;
-	}
-	else if (position == "wwb000" || position == "0wwb00" || position == "00wwb0"
-		|| position == "000wwb" 
-		|| position == "bww000" || position == "bww000" || position == "0bww00"
-		|| position == "00bww0")
-	{
-		return evaluation + 100;
-	}
-	else if (position == "w0000" || position == "0w000" || position == "00w000"
-		|| position == "000w00"
-		|| position == "0000w0" || position == "00000w")
-	{
-		return evaluation + 10;
-	}
-	return evaluation + 1;
+	if (position.find("wwwww"))
+		return 100000000;
+	else if (position.find("wwwwb") || position.find("bwwww"))
+		return 1000000;
+	else if (position.find("wwww"))
+		return 10000000;
+	else if (position.find("wwwb") || position.find("bwww"))
+		return 10000;
+	else if (position.find("www"))
+		return 100000;
+	else if (position.find("wwb") || position.find("bww"))
+		return 100;
+	else if (position.find("ww"))
+		return 1000;
+	else if (position.find("w"))
+		return 10;
+	return 1;
 }
