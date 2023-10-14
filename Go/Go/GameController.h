@@ -19,7 +19,7 @@ private:
 	bool FindHistoryComb(const point& beg, const point& end);
 	char DefineMove();
 
-	int EvaluationFunc(const std::string position);
+	int Evaluation(const int* score, const std::string& position, const bool& aiMove);
 
 	void CheckInputValidation(int& x, int& y);
 	void CheckInputValidation(int& prevX_coord, int& prevY_coord,

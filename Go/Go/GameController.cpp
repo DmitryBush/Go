@@ -334,23 +334,59 @@ void gameController::CheckInputValidation(int& prevX_coord, int& prevY_coord,
 	}
 }
 
-int gameController::EvaluationFunc(const std::string position)
+int gameController::Evaluation(const int* score, const std::string& position, 
+	const bool& aiMove)
 {
-	if (position.find("wwwww"))
-		return 100000000;
-	else if (position.find("wwwwb") || position.find("bwwww"))
-		return 1000000;
-	else if (position.find("wwww"))
-		return 10000000;
-	else if (position.find("wwwb") || position.find("bwww"))
-		return 10000;
-	else if (position.find("www"))
-		return 100000;
-	else if (position.find("wwb") || position.find("bww"))
-		return 100;
-	else if (position.find("ww"))
-		return 1000;
-	else if (position.find("w"))
-		return 10;
-	return 1;
+	if (aiMove)
+	{
+		int evaluation = score[1] - score[0];
+
+		if (position.find("wwwww")) //score
+			return evaluation + 100000000;
+		else if (position.find("wwwwb") || position.find("bwwww") || position.find("w0www")
+			|| position.find("ww0ww") || position.find("www0w")) //chong4
+			return evaluation + 1000000;
+		else if (position.find("0wwww0")) // hoi4
+			return evaluation + 10000000;
+		else if (position.find("wwwb") || position.find("bwww") // mian 3
+			|| position.find("w0wwb") || position.find("ww0wb") || position.find("www0b")
+			|| position.find("b0www") || position.find("bw0ww") || position.find("bww0w")
+			|| position.find("w00ww") || position.find("ww00w") || position.find("www00")
+			|| position.find("w0w0w") || position.find("w0ww") || position.find("ww0w"))
+			return evaluation + 10000;
+		else if (position.find("0www0") || position.find("0w0ww0") || position.find("0ww0w0"))
+			return evaluation + 100000; // huo3
+		else if (position.find("wwb") || position.find("bww") // mian2
+			|| position.find("w0wb") || position.find("w00wb") || position.find("w000w")
+			|| position.find("b0w0w0b") || position.find("b0ww00b") || position.find("bw0w00")
+			|| position.find("bw00w0") || position.find("b00ww0b"))
+			return evaluation + 100;
+		else if (position.find("0ww0") || position.find("0w00w0") || position.find("0w0w0"))
+			return evaluation + 1000; // huo2
+		else if (position.find("w"))
+			return evaluation + 10;
+		return evaluation + 1;
+	}
+	else
+	{
+		int evaluation = score[0] - score[1];
+
+		if (position.find("wwwww"))
+			return -(evaluation + 100000000);
+		else if (position.find("wwwwb") || position.find("bwwww"))
+			return -(evaluation + 1000000);
+		else if (position.find("wwww"))
+			return -(evaluation + 10000000);
+		else if (position.find("wwwb") || position.find("bwww"))
+			return -(evaluation + 10000);
+		else if (position.find("www"))
+			return -(evaluation + 100000);
+		else if (position.find("wwb") || position.find("bww"))
+			return -(evaluation + 100);
+		else if (position.find("ww"))
+			return -(evaluation + 1000);
+		else if (position.find("w"))
+			return -(evaluation + 10);
+		return -(evaluation + 1);
+	}
 }
