@@ -4,10 +4,11 @@
 int main()
 {
 	system("chcp 1251");
-    gameController controller(5, 5);
+    gameController controller(9, 9);
 
-	while (true)
+	controller.PlayerMove();
+	/*while (true)
 	{
 		controller.PlayerMove();
-	}
+	}*/
 }

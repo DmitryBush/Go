@@ -17,6 +17,7 @@ private:
 	int Update();
 	bool FindHistoryComb(const point& beg, const point& end);
 	char DefineMove();
+	int EvaluationFunc(std::string position);
 
 	int EvaluationFunc();
 
