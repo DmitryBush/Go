@@ -4,8 +4,19 @@
 #include <conio.h>
 
 gameController::gameController(const unsigned int& x, const unsigned int& y):
-	width(x), height(y), gameMap(width, height), complete(false), blackMove(true)
-{}
+	width(x), height(y), gameMap(width, height), complete(false), opponentFirstMove(false)
+{
+	if (opponentFirstMove)
+	{
+		aiStone = 'w';
+		playerStone = 'b';
+	}
+	else
+	{
+		aiStone = 'w';
+		playerStone = 'b';
+	}
+}
 
 void gameController::PlayerMove()
 {
@@ -14,7 +25,7 @@ void gameController::PlayerMove()
 		system("cls");
 		TextModeOutput();
 
-		if (blackMove)
+		if (opponentFirstMove)
 		{
 			if (usedStone[0] == 12)
 			{
@@ -65,7 +76,11 @@ void gameController::PlayerMove(const bool setStone)
 		gameMap.SetStone(x - 1, y - 1, DefineMove());
 		Update();
 
-		blackMove = !blackMove;
+		if (!opponentFirstMove)
+		{
+			DebugOutputMoveAnalyzer(x - 1, y - 1, true);
+		}
+		//opponentFirstMove = !opponentFirstMove;
 	}
 	else
 	{
@@ -82,7 +97,11 @@ void gameController::PlayerMove(const bool setStone)
 		gameMap.MoveStone(prevX_coord - 1, prevY_coord - 1, x - 1, y - 1);
 		Update();
 
-		blackMove = !blackMove;
+		if (!opponentFirstMove)
+		{
+			DebugOutputMoveAnalyzer(x - 1, y - 1, true);
+		}
+		//opponentFirstMove = !opponentFirstMove;
 	}
 }
 
@@ -113,13 +132,13 @@ int gameController::Update()
 
 		if (lenRow == 5)
 		{
-			if (blackMove && !FindHistoryComb(beg, end))
+			if (opponentFirstMove && !FindHistoryComb(beg, end))
 			{
-				playersScore[0]++; playersHistory[0].PushForward(beg, end);
+				playersScore[0]++; playersHistComb[0].PushForward(beg, end);
 			}	
 			else if (!FindHistoryComb(beg, end))
 			{
-				playersScore[1]++; playersHistory[1].PushForward(beg, end);
+				playersScore[1]++; playersHistComb[1].PushForward(beg, end);
 			}	
 		}
 	}
@@ -150,13 +169,13 @@ int gameController::Update()
 
 		if (lenColumn == 5)
 		{
-			if (blackMove && !FindHistoryComb(beg, end))
+			if (opponentFirstMove && !FindHistoryComb(beg, end))
 			{
-				playersScore[0]++; playersHistory[0].PushForward(beg, end);
+				playersScore[0]++; playersHistComb[0].PushForward(beg, end);
 			}
 			else if (!FindHistoryComb(beg, end))
 			{
-				playersScore[1]++; playersHistory[1].PushForward(beg, end);
+				playersScore[1]++; playersHistComb[1].PushForward(beg, end);
 			}
 		}
 	}
@@ -183,13 +202,13 @@ int gameController::Update()
 
 		if (lenDiagonal == 5)
 		{
-			if (blackMove && !FindHistoryComb(beg, end))
+			if (opponentFirstMove && !FindHistoryComb(beg, end))
 			{
-				playersScore[0]++; playersHistory[0].PushForward(beg, end);
+				playersScore[0]++; playersHistComb[0].PushForward(beg, end);
 			}
 			else if (!FindHistoryComb(beg, end))
 			{
-				playersScore[1]++; playersHistory[1].PushForward(beg, end);
+				playersScore[1]++; playersHistComb[1].PushForward(beg, end);
 			}
 		}
 	}
@@ -216,13 +235,13 @@ int gameController::Update()
 
 		if (lenSideDiagonal == 5)
 		{
-			if (blackMove && !FindHistoryComb(beg, end))
+			if (opponentFirstMove && !FindHistoryComb(beg, end))
 			{
-				playersScore[0]++; playersHistory[0].PushForward(beg, end);
+				playersScore[0]++; playersHistComb[0].PushForward(beg, end);
 			}
 			else if (!FindHistoryComb(beg, end))
 			{
-				playersScore[1]++; playersHistory[1].PushForward(beg, end);
+				playersScore[1]++; playersHistComb[1].PushForward(beg, end);
 			}
 		}
 	}
@@ -235,34 +254,34 @@ int gameController::Update()
 
 bool gameController::FindHistoryComb(const point& beg, const point& end)
 {
-	if (blackMove)
-		for (int i = 0; i < playersHistory[0].GetCountOfElements(); i++)
-			if (playersHistory[0][i][0] == beg && playersHistory[0][i][1] == end)
+	if (opponentFirstMove)
+		for (int i = 0; i < playersHistComb[0].GetCountOfElements(); i++)
+			if (playersHistComb[0][i][0] == beg && playersHistComb[0][i][1] == end)
 				return true;
 	else
-		for (int i = 0; i < playersHistory[1].GetCountOfElements(); i++)
-			if (playersHistory[1][i][0] == beg && playersHistory[1][i][1] == end)
+		for (int i = 0; i < playersHistComb[1].GetCountOfElements(); i++)
+			if (playersHistComb[1][i][0] == beg && playersHistComb[1][i][1] == end)
 				return true;
 	return false;
 }
 
 char gameController::DefineMove()
 {
-	if (blackMove)
+	if (opponentFirstMove)
 		return 'b';
 	return 'w';
 }
 
 void gameController::Restart()
 {
-	blackMove = true;
+	opponentFirstMove = true;
 
 	gameMap.ResetField();
 	
 	for (auto i = 0; i < 2; i++)
 	{
 		usedStone[i] = 0; playersScore[i] = 0;
-		playersHistory[i].Clear();
+		playersHistComb[i].Clear();
 	}	
 }
 
@@ -270,7 +289,7 @@ void gameController::TextModeOutput()
 {
 	std::cout << "Очки " << playersScore[0] << " - Черные фишки, "
 		<< playersScore[1] << " - белые фишки\n";
-	playersHistory[0].Print();
+	playersHistComb[0].Print();
 	std::cout << "  ";
 	for (int i = 1; i <= height; i++)
 	{
@@ -334,59 +353,205 @@ void gameController::CheckInputValidation(int& prevX_coord, int& prevY_coord,
 	}
 }
 
-int gameController::Evaluation(const int* score, const std::string& position, 
-	const bool& aiMove)
+int gameController::CheckPattern(const std::string& position, const bool& ai, 
+	const char& currStone)
 {
-	if (aiMove)
+	if (currStone == 'b')
 	{
-		int evaluation = score[1] - score[0];
+		int patternEval = 0;
 
-		if (position.find("wwwww")) //score
-			return evaluation + 100000000;
-		else if (position.find("wwwwb") || position.find("bwwww") || position.find("w0www")
-			|| position.find("ww0ww") || position.find("www0w")) //chong4
-			return evaluation + 1000000;
-		else if (position.find("0wwww0")) // hoi4
-			return evaluation + 10000000;
-		else if (position.find("wwwb") || position.find("bwww") // mian 3
-			|| position.find("w0wwb") || position.find("ww0wb") || position.find("www0b")
-			|| position.find("b0www") || position.find("bw0ww") || position.find("bww0w")
-			|| position.find("w00ww") || position.find("ww00w") || position.find("www00")
-			|| position.find("w0w0w") || position.find("w0ww") || position.find("ww0w"))
-			return evaluation + 10000;
-		else if (position.find("0www0") || position.find("0w0ww0") || position.find("0ww0w0"))
-			return evaluation + 100000; // huo3
-		else if (position.find("wwb") || position.find("bww") // mian2
-			|| position.find("w0wb") || position.find("w00wb") || position.find("w000w")
-			|| position.find("b0w0w0b") || position.find("b0ww00b") || position.find("bw0w00")
-			|| position.find("bw00w0") || position.find("b00ww0b"))
-			return evaluation + 100;
-		else if (position.find("0ww0") || position.find("0w00w0") || position.find("0w0w0"))
-			return evaluation + 1000; // huo2
-		else if (position.find("w"))
-			return evaluation + 10;
-		return evaluation + 1;
+		if (position.find("bbbbb") != std::string::npos) //score
+			patternEval += 100000000;
+		if (position.find("bbbbw") != std::string::npos 
+			|| position.find("wbbbb") != std::string::npos
+			|| position.find("b0bbb") != std::string::npos
+			|| position.find("bb0bb") != std::string::npos
+			|| position.find("bbb0b") != std::string::npos) //chong4
+			patternEval += 1000000;
+		if (position.find("0bbbb0") != std::string::npos) // hoi4
+			patternEval += 10000000;
+		if (position.find("bbbw") != std::string::npos
+			|| position.find("wbbb") != std::string::npos// mian 3
+			|| position.find("b0bbw") != std::string::npos
+			|| position.find("bb0bw") != std::string::npos
+			|| position.find("bbb0w") != std::string::npos
+			|| position.find("w0bbb") != std::string::npos
+			|| position.find("wb0bb") != std::string::npos
+			|| position.find("wbb0b") != std::string::npos
+			|| position.find("b00bb") != std::string::npos
+			|| position.find("bb00b") != std::string::npos
+			|| position.find("bbb00") != std::string::npos
+			|| position.find("b0b0b") != std::string::npos
+			|| position.find("b0bb") != std::string::npos
+			|| position.find("bb0b") != std::string::npos)
+			patternEval += 10000;
+		if (position.find("0bbb0") != std::string::npos
+			|| position.find("0b0bb0") != std::string::npos
+			|| position.find("0bb0b0") != std::string::npos)
+			patternEval += 100000; // huo3
+		if (position.find("bbw") != std::string::npos
+			|| position.find("wbb") != std::string::npos// mian2
+			|| position.find("b0bw") != std::string::npos
+			|| position.find("b00bw") != std::string::npos
+			|| position.find("b000b") != std::string::npos
+			|| position.find("w0b0b0w") != std::string::npos
+			|| position.find("w0bb00w") != std::string::npos
+			|| position.find("wb0b00") != std::string::npos
+			|| position.find("wb00b0") != std::string::npos
+			|| position.find("w00bb0w") != std::string::npos)
+			patternEval += 100;
+		if (position.find("0bb0") != std::string::npos
+			|| position.find("0b00b0") != std::string::npos
+			|| position.find("0b0b0") != std::string::npos)
+			patternEval += 1000; // huo2
+		if (position.find("b") != std::string::npos)
+			patternEval += 10;
+		if (DefineZeroStr(position))
+			patternEval += 1;
+		if (aiStone == currStone)
+		{
+			return patternEval;
+		}
+		return -patternEval;
 	}
 	else
 	{
-		int evaluation = score[0] - score[1];
+		int patternEval = 0;
 
-		if (position.find("wwwww"))
-			return -(evaluation + 100000000);
-		else if (position.find("wwwwb") || position.find("bwwww"))
-			return -(evaluation + 1000000);
-		else if (position.find("wwww"))
-			return -(evaluation + 10000000);
-		else if (position.find("wwwb") || position.find("bwww"))
-			return -(evaluation + 10000);
-		else if (position.find("www"))
-			return -(evaluation + 100000);
-		else if (position.find("wwb") || position.find("bww"))
-			return -(evaluation + 100);
-		else if (position.find("ww"))
-			return -(evaluation + 1000);
-		else if (position.find("w"))
-			return -(evaluation + 10);
-		return -(evaluation + 1);
+		if (position.find("wwwww") != std::string::npos) //score
+			patternEval += 100000000;
+		if (position.find("wwwwb") != std::string::npos 
+			|| position.find("bwwww") != std::string::npos 
+			|| position.find("w0www") != std::string::npos
+			|| position.find("ww0ww") != std::string::npos
+			|| position.find("www0w") != std::string::npos) //chong4
+			patternEval += 1000000;
+		if (position.find("0wwww0") != std::string::npos) // hoi4
+			patternEval += 10000000;
+		if (position.find("wwwb") != std::string::npos 
+			|| position.find("bwww") != std::string::npos // mian 3
+			|| position.find("w0wwb") != std::string::npos 
+			|| position.find("ww0wb") != std::string::npos 
+			|| position.find("www0b") != std::string::npos
+			|| position.find("b0www") != std::string::npos 
+			|| position.find("bw0ww") != std::string::npos 
+			|| position.find("bww0w") != std::string::npos
+			|| position.find("w00ww") != std::string::npos
+			|| position.find("ww00w") != std::string::npos 
+			|| position.find("www00") != std::string::npos
+			|| position.find("w0w0w") != std::string::npos
+			|| position.find("w0ww") != std::string::npos 
+			|| position.find("ww0w") != std::string::npos)
+			patternEval += 10000;
+		if (position.find("0www0") != std::string::npos
+			|| position.find("0w0ww0") != std::string::npos
+			|| position.find("0ww0w0") != std::string::npos)
+			patternEval += 100000; // huo3
+		if (position.find("wwb") != std::string::npos
+			|| position.find("bww") != std::string::npos// mian2
+			|| position.find("w0wb") != std::string::npos
+			|| position.find("w00wb") != std::string::npos
+			|| position.find("w000w") != std::string::npos
+			|| position.find("b0w0w0b") != std::string::npos
+			|| position.find("b0ww00b") != std::string::npos
+			|| position.find("bw0w00") != std::string::npos
+			|| position.find("bw00w0") != std::string::npos
+			|| position.find("b00ww0b") != std::string::npos)
+			patternEval += 100;
+		if (position.find("0ww0") != std::string::npos
+			|| position.find("0w00w0") != std::string::npos
+			|| position.find("0w0w0") != std::string::npos)
+			patternEval += 1000; // huo2
+		if (position.find("w") != std::string::npos)
+			patternEval += 10;
+		if (DefineZeroStr(position))
+			patternEval += 1;
+		if (aiStone == currStone)
+		{
+			return patternEval;
+		}
+		return -patternEval;
 	}
+}
+
+int gameController::Evaluation(const unsigned int x, const unsigned int y, const bool& ai)
+{
+	int evaluation = 0;
+	std::string position;
+
+	for (int i = 0, j = y; i < width; i++) 
+		position += gameMap.GetCell(i, j);
+	evaluation += CheckPattern(position, ai, aiStone);
+	evaluation += CheckPattern(position, false, playerStone);
+	position.clear();
+
+	for (int i = x, j = 0; j < width; j++)
+		position += gameMap.GetCell(i, j);
+	evaluation += CheckPattern(position, ai, aiStone);
+	evaluation += CheckPattern(position, false, playerStone);
+	position.clear();
+
+	if (x + y < width) 
+	{ 
+		for (int i = 0, j = x + y; i < width && j >= 0; i++, j--)
+			position += gameMap.GetCell(i, j);
+	}
+	else 
+	{
+		for (int i = x + y - 7, j = width - 1; i < width && j >= 0; i++, j--) 
+			position += gameMap.GetCell(i, j);
+	}
+	evaluation += CheckPattern(position, ai, aiStone);
+	evaluation += CheckPattern(position, false, playerStone);
+	position.clear();
+
+	if (x <= y) 
+	{
+		for (int i = 0, j = y - x; i < width && j < width; i++, j++)
+			position += gameMap.GetCell(i, j);
+	}
+	else
+	{
+		for (int i = x - y, j = 0; i < width && j < width; i++, j++)
+			position += gameMap.GetCell(i, j);
+	}
+	evaluation += CheckPattern(position, ai, aiStone);
+	evaluation += CheckPattern(position, false, playerStone);
+	position.clear();
+	std::cout << evaluation << '\n';
+	return evaluation;
+}
+
+void gameController::DebugOutputMoveAnalyzer(const unsigned int x, 
+	const unsigned int y, const bool& ai)
+{
+	if (opponentFirstMove)
+	{
+		std::cout << "Information about Player unknown" << '\n';
+		system("pause");
+	}
+	else
+	{
+		int eval = 0;
+		for (auto i = 0; i < width; i++)
+		{
+			for (auto j = 0; j < width; j++)
+			{
+				if (gameMap.GetCell(i, j) != '0')
+				{
+					eval += Evaluation(i, j, ai);
+				}
+			}
+		}
+		std::cout << eval << '\n';
+		system("pause");
+	}
+}
+
+bool gameController::DefineZeroStr(const std::string& string)
+{
+	for (auto i = 0; i < string.size(); i++)
+		if (string[i] != '0')
+			return false;
+	return true;
 }
