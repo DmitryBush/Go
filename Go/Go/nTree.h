@@ -1,43 +1,57 @@
 #pragma once
 #include "DynamicArr.h"
 #include <functional>
+#include "ListPositions.h"
+
+class minMaxNode
+{
+public:
+	point currentPos;
+	char currTurn;
+	listPositions pos;
+
+	minMaxNode(listPositions& positionList,
+		const int& x = 0, const int& y = 0, const char& turn = 0):
+		currentPos(x, y), currTurn(turn), pos(positionList) {}
+};
 
 class nTreeNode
 {
 public:
-	int value;
+	minMaxNode data;
 	dynamicArr<nTreeNode> sons;
 
-	nTreeNode(const int& val = 0): value(val) {}
+	nTreeNode(minMaxNode node):
+		data(node) {}
 };
 
 class nTree
 {
 private:
 	nTreeNode* root, *current;
+
 	unsigned int countElements, height, currHeight;
 
 	void DefineHeight(nTreeNode* node, unsigned int maxHeight);
 	void NTreePass(nTreeNode* node, unsigned int maxHeight,
 		const std::function<void(nTreeNode*, unsigned int)> t);
-	void Task(nTreeNode* node, unsigned int& maxHeight, unsigned int currHeight);
 	void Clear(nTreeNode* node);
-	void PrintCurr(nTreeNode* node, unsigned int depth);
 public:
 	nTree();
 
-	void Push(const int& val);
+	void Push(const int& x, const int& y, const char& turn,
+		listPositions& positionList);
 	void MoveNode(const int& node);
 	void DeleteCurrHeight();
-	void PrintCurr();
 
 	unsigned int GetHeight() { return height; }
 	void ResetToRoot();
 
-	void Clear();
+	point& GetPosition();
+	char GetTurn();
+	listPositions& GetList();
 
-	void Print();
-	void Task();
+	void Clear();
 
 	~nTree();
 };

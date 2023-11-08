@@ -562,3 +562,124 @@ bool gameController::DefineZeroStr(const std::string& string)
 			return false;
 	return true;
 }
+
+bool gameController::CheckPattern(const std::string& position, const GamePattern pattern,
+	const char& stone)
+{
+	switch (pattern)
+	{
+	case GamePattern::LineFive:
+		if (stone == 'b')
+		{
+			if (position.find("bbbbb") != std::string::npos)
+				return true;
+			return false;
+		}
+		else
+		{
+			if (position.find("wwwww") != std::string::npos)
+				return true;
+			return false;
+		}
+		break;
+	case GamePattern::LiveFour:
+		break;
+	case GamePattern::StrikingFour:
+		break;
+	case GamePattern::LiveThree:
+		break;
+	case GamePattern::SleepingThree:
+		break;
+	case GamePattern::LiveTwo:
+		break;
+	case GamePattern::SleepingTwo:
+		break;
+	case GamePattern::OneStone:
+		break;
+	case GamePattern::NoStone:
+		break;
+	default:
+		break;
+	}
+}
+
+//bool gameController::IsScoreLine(const unsigned int& x, const unsigned int& y)
+//{
+//	std::string position;
+//
+//	for (int i = 0, j = y; i < width; i++) // проверка столбцов
+//		position += gameMap.GetCell(i, j);
+//	if (CheckPattern(position, GamePattern::LineFive, 'b'))
+//		return true;
+//	else if (CheckPattern(position, GamePattern::LineFive, 'w'))
+//		return true;
+//	position.clear();
+//
+//	for (int i = x, j = 0; j < width; j++) // проверка строк
+//		position += gameMap.GetCell(i, j);
+//	position.clear();
+//
+//	if (x + y < width) // проверка побочной диагонали
+//	{
+//		for (int i = 0, j = x + y; i < width && j >= 0;
+//			i++, j--)
+//			position += gameMap.GetCell(i, j);
+//	}
+//	else
+//	{
+//		for (int i = x + y - 7, j = width - 1;
+//			i < width && j >= 0; i++, j--)
+//			position += gameMap.GetCell(i, j);
+//	}
+//	if (CheckPattern(position, GamePattern::LineFive, 'b'))
+//		return true;
+//	else if (CheckPattern(position, GamePattern::LineFive, 'w'))
+//		return true;
+//	position.clear();
+//
+//	if (x <= y) // проверка главной диагонали
+//	{
+//		for (int i = 0, j = y - x; i < width && j < width;
+//			i++, j++)
+//			position += gameMap.GetCell(i, j);
+//	}
+//	else
+//	{
+//		for (int i = x - y, j = 0; i < width && j < width;
+//			i++, j++)
+//			position += gameMap.GetCell(i, j);
+//	}
+//	if (CheckPattern(position, GamePattern::LineFive, 'b'))
+//		return true;
+//	else if (CheckPattern(position, GamePattern::LineFive, 'w'))
+//		return true;
+//	position.clear();
+//}
+
+//bool gameController::FindPrevPos(nTreeNode* node)
+//{
+//	for (auto i = 0; i < node->pos.GetCountOfElements(); i++)
+//	{
+//
+//	}
+//}
+//
+//int gameController::MiniMax(nTreeNode* node, const unsigned int depth)
+//{
+//	if (depth == 0)
+//		return Evaluation(node.GetX(), node.GetY());
+//
+//	if (FindPrevPos(node.GetX(), node.GetY()))
+//	{
+//
+//	}
+//	
+//	if (node.GetTurn() == 'a')
+//	{
+//
+//	}
+//	else
+//	{
+//
+//	}
+//}

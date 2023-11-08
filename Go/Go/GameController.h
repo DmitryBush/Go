@@ -2,6 +2,14 @@
 #include "Map.h"
 #include "List.h"
 #include <string>
+#include "nTree.h"
+#include <functional>
+
+enum GamePattern
+{
+	NoStone = 0, OneStone = 1, SleepingTwo = 2, LiveTwo = 3, SleepingThree = 4,
+	LiveThree = 5, StrikingFour = 6, LiveFour = 7, LineFive = 8
+};
 
 class gameController
 {
@@ -15,6 +23,8 @@ private:
 	list playersHistComb[2];
 	map gameMap;
 
+	nTree MinMaxTree;
+
 	void PlayerMove(const bool setStone);
 	int Update();
 	bool FindHistoryComb(const point& beg, const point& end);
@@ -22,6 +32,13 @@ private:
 
 	int CheckPattern(const std::string& position, const char& stone);
 	int Evaluation(const unsigned int x, const unsigned int y);
+	//bool IsScoreLine(const unsigned int& x, const unsigned int& y);
+
+	bool CheckPattern(const std::string& position, const GamePattern pattern,
+		const char& stone);
+
+	int MiniMax(nTreeNode* node, const unsigned int depth);
+	bool FindPrevPos(nTreeNode* node);
 
 	void CheckInputValidation(int& x, int& y);
 	void CheckInputValidation(int& prevX_coord, int& prevY_coord,
