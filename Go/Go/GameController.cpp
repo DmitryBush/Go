@@ -4,7 +4,7 @@
 #include <conio.h>
 
 gameController::gameController(const unsigned int& x, const unsigned int& y):
-	width(x), height(y), gameMap(width, height), complete(false), opponentFirstMove(false)
+	width(x), height(y), gameMap(width, height), complete(false), opponentFirstMove(true)
 {
 	if (opponentFirstMove)
 	{
@@ -76,11 +76,8 @@ void gameController::PlayerMove(const bool setStone)
 		gameMap.SetStone(x - 1, y - 1, DefineMove());
 		Update();
 
-		if (!opponentFirstMove)
-		{
-			DebugOutputMoveAnalyzer(x - 1, y - 1, true);
-		}
-		//opponentFirstMove = !opponentFirstMove;
+		DebugOutputMoveAnalyzer();
+		opponentFirstMove = !opponentFirstMove;
 	}
 	else
 	{
@@ -97,11 +94,8 @@ void gameController::PlayerMove(const bool setStone)
 		gameMap.MoveStone(prevX_coord - 1, prevY_coord - 1, x - 1, y - 1);
 		Update();
 
-		if (!opponentFirstMove)
-		{
-			DebugOutputMoveAnalyzer(x - 1, y - 1, true);
-		}
-		//opponentFirstMove = !opponentFirstMove;
+		DebugOutputMoveAnalyzer();
+		opponentFirstMove = !opponentFirstMove;
 	}
 }
 
@@ -353,25 +347,31 @@ void gameController::CheckInputValidation(int& prevX_coord, int& prevY_coord,
 	}
 }
 
-int gameController::CheckPattern(const std::string& position, const bool& ai, 
+/*
+* Метод распознавания паттернов ГО-БАНА
+*/
+int gameController::CheckPattern(const std::string& position,
 	const char& currStone)
 {
 	if (currStone == 'b')
 	{
 		int patternEval = 0;
-
-		if (position.find("bbbbb") != std::string::npos) //score
+		// посследовательность из пяти
+		if (position.find("bbbbb") != std::string::npos)
 			patternEval += 100000000;
-		if (position.find("bbbbw") != std::string::npos 
+		// Ударная четыре
+		if (position.find("bbbbw") != std::string::npos
 			|| position.find("wbbbb") != std::string::npos
 			|| position.find("b0bbb") != std::string::npos
 			|| position.find("bb0bb") != std::string::npos
-			|| position.find("bbb0b") != std::string::npos) //chong4
+			|| position.find("bbb0b") != std::string::npos)
 			patternEval += 1000000;
-		if (position.find("0bbbb0") != std::string::npos) // hoi4
+		// Живая четверка
+		if (position.find("0bbbb0") != std::string::npos)
 			patternEval += 10000000;
+		// Спящая тройка
 		if (position.find("bbbw") != std::string::npos
-			|| position.find("wbbb") != std::string::npos// mian 3
+			|| position.find("wbbb") != std::string::npos 
 			|| position.find("b0bbw") != std::string::npos
 			|| position.find("bb0bw") != std::string::npos
 			|| position.find("bbb0w") != std::string::npos
@@ -385,12 +385,14 @@ int gameController::CheckPattern(const std::string& position, const bool& ai,
 			|| position.find("b0bb") != std::string::npos
 			|| position.find("bb0b") != std::string::npos)
 			patternEval += 10000;
+		// живая тройка
 		if (position.find("0bbb0") != std::string::npos
 			|| position.find("0b0bb0") != std::string::npos
 			|| position.find("0bb0b0") != std::string::npos)
-			patternEval += 100000; // huo3
+			patternEval += 100000;
+		// спящая двойка
 		if (position.find("bbw") != std::string::npos
-			|| position.find("wbb") != std::string::npos// mian2
+			|| position.find("wbb") != std::string::npos
 			|| position.find("b0bw") != std::string::npos
 			|| position.find("b00bw") != std::string::npos
 			|| position.find("b000b") != std::string::npos
@@ -400,13 +402,15 @@ int gameController::CheckPattern(const std::string& position, const bool& ai,
 			|| position.find("wb00b0") != std::string::npos
 			|| position.find("w00bb0w") != std::string::npos)
 			patternEval += 100;
+		// живая двойка
 		if (position.find("0bb0") != std::string::npos
 			|| position.find("0b00b0") != std::string::npos
 			|| position.find("0b0b0") != std::string::npos)
-			patternEval += 1000; // huo2
-		if (position.find("b") != std::string::npos)
+			patternEval += 1000;
+		// один камень
+		if (position.find("b") != std::string::npos)						
 			patternEval += 10;
-		if (DefineZeroStr(position))
+		if (DefineZeroStr(position)) // нет элементов
 			patternEval += 1;
 		if (aiStone == currStone)
 		{
@@ -417,38 +421,43 @@ int gameController::CheckPattern(const std::string& position, const bool& ai,
 	else
 	{
 		int patternEval = 0;
-
-		if (position.find("wwwww") != std::string::npos) //score
+		// посследовательность из пяти
+		if (position.find("wwwww") != std::string::npos)
 			patternEval += 100000000;
-		if (position.find("wwwwb") != std::string::npos 
-			|| position.find("bwwww") != std::string::npos 
+		// Ударная четыре
+		if (position.find("wwwwb") != std::string::npos
+			|| position.find("bwwww") != std::string::npos
 			|| position.find("w0www") != std::string::npos
 			|| position.find("ww0ww") != std::string::npos
-			|| position.find("www0w") != std::string::npos) //chong4
+			|| position.find("www0w") != std::string::npos)
 			patternEval += 1000000;
-		if (position.find("0wwww0") != std::string::npos) // hoi4
+		// Живая четверка
+		if (position.find("0wwww0") != std::string::npos)
 			patternEval += 10000000;
-		if (position.find("wwwb") != std::string::npos 
-			|| position.find("bwww") != std::string::npos // mian 3
-			|| position.find("w0wwb") != std::string::npos 
-			|| position.find("ww0wb") != std::string::npos 
+		// Спящая тройка
+		if (position.find("wwwb") != std::string::npos
+			|| position.find("bwww") != std::string::npos
+			|| position.find("w0wwb") != std::string::npos
+			|| position.find("ww0wb") != std::string::npos
 			|| position.find("www0b") != std::string::npos
-			|| position.find("b0www") != std::string::npos 
-			|| position.find("bw0ww") != std::string::npos 
+			|| position.find("b0www") != std::string::npos
+			|| position.find("bw0ww") != std::string::npos
 			|| position.find("bww0w") != std::string::npos
 			|| position.find("w00ww") != std::string::npos
-			|| position.find("ww00w") != std::string::npos 
+			|| position.find("ww00w") != std::string::npos
 			|| position.find("www00") != std::string::npos
 			|| position.find("w0w0w") != std::string::npos
-			|| position.find("w0ww") != std::string::npos 
+			|| position.find("w0ww") != std::string::npos
 			|| position.find("ww0w") != std::string::npos)
 			patternEval += 10000;
+		// живая тройка
 		if (position.find("0www0") != std::string::npos
 			|| position.find("0w0ww0") != std::string::npos
 			|| position.find("0ww0w0") != std::string::npos)
-			patternEval += 100000; // huo3
+			patternEval += 100000;
+		// спящая двойка
 		if (position.find("wwb") != std::string::npos
-			|| position.find("bww") != std::string::npos// mian2
+			|| position.find("bww") != std::string::npos
 			|| position.find("w0wb") != std::string::npos
 			|| position.find("w00wb") != std::string::npos
 			|| position.find("w000w") != std::string::npos
@@ -458,13 +467,15 @@ int gameController::CheckPattern(const std::string& position, const bool& ai,
 			|| position.find("bw00w0") != std::string::npos
 			|| position.find("b00ww0b") != std::string::npos)
 			patternEval += 100;
-		if (position.find("0ww0") != std::string::npos
+		// живая двойка
+		if (position.find("0ww0") != std::string::npos 
 			|| position.find("0w00w0") != std::string::npos
 			|| position.find("0w0w0") != std::string::npos)
-			patternEval += 1000; // huo2
+			patternEval += 1000;
+		// один камень
 		if (position.find("w") != std::string::npos)
 			patternEval += 10;
-		if (DefineZeroStr(position))
+		if (DefineZeroStr(position))	// нет элементов
 			patternEval += 1;
 		if (aiStone == currStone)
 		{
@@ -473,79 +484,75 @@ int gameController::CheckPattern(const std::string& position, const bool& ai,
 		return -patternEval;
 	}
 }
-
-int gameController::Evaluation(const unsigned int x, const unsigned int y, const bool& ai)
+/*
+* Метод определяющий оценку для ИИ на поле
+*/
+int gameController::Evaluation(const unsigned int x,
+	const unsigned int y)
 {
 	int evaluation = 0;
 	std::string position;
 
-	for (int i = 0, j = y; i < width; i++) 
+	for (int i = 0, j = y; i < width; i++) // проверка столбцов
 		position += gameMap.GetCell(i, j);
-	evaluation += CheckPattern(position, ai, aiStone);
-	evaluation += CheckPattern(position, false, playerStone);
+	evaluation += CheckPattern(position, aiStone);
+	evaluation += CheckPattern(position, playerStone);
 	position.clear();
 
-	for (int i = x, j = 0; j < width; j++)
+	for (int i = x, j = 0; j < width; j++) // проверка строк
 		position += gameMap.GetCell(i, j);
-	evaluation += CheckPattern(position, ai, aiStone);
-	evaluation += CheckPattern(position, false, playerStone);
+	evaluation += CheckPattern(position, aiStone);
+	evaluation += CheckPattern(position, playerStone);
 	position.clear();
 
-	if (x + y < width) 
-	{ 
-		for (int i = 0, j = x + y; i < width && j >= 0; i++, j--)
-			position += gameMap.GetCell(i, j);
-	}
-	else 
+	if (x + y < width) // проверка побочной диагонали
 	{
-		for (int i = x + y - 7, j = width - 1; i < width && j >= 0; i++, j--) 
-			position += gameMap.GetCell(i, j);
-	}
-	evaluation += CheckPattern(position, ai, aiStone);
-	evaluation += CheckPattern(position, false, playerStone);
-	position.clear();
-
-	if (x <= y) 
-	{
-		for (int i = 0, j = y - x; i < width && j < width; i++, j++)
+		for (int i = 0, j = x + y; i < width && j >= 0;
+			i++, j--)
 			position += gameMap.GetCell(i, j);
 	}
 	else
 	{
-		for (int i = x - y, j = 0; i < width && j < width; i++, j++)
+		for (int i = x + y - 7, j = width - 1;
+			i < width && j >= 0; i++, j--)
 			position += gameMap.GetCell(i, j);
 	}
-	evaluation += CheckPattern(position, ai, aiStone);
-	evaluation += CheckPattern(position, false, playerStone);
+	evaluation += CheckPattern(position, aiStone);
+	evaluation += CheckPattern(position, playerStone);
 	position.clear();
-	std::cout << evaluation << '\n';
+
+	if (x <= y) // проверка главной диагонали
+	{
+		for (int i = 0, j = y - x; i < width && j < width;
+			i++, j++)
+			position += gameMap.GetCell(i, j);
+	}
+	else
+	{
+		for (int i = x - y, j = 0; i < width && j < width;
+			i++, j++)
+			position += gameMap.GetCell(i, j);
+	}
+	evaluation += CheckPattern(position, aiStone);
+	evaluation += CheckPattern(position, playerStone);
+	position.clear();
+
 	return evaluation;
 }
 
-void gameController::DebugOutputMoveAnalyzer(const unsigned int x, 
-	const unsigned int y, const bool& ai)
+
+void gameController::DebugOutputMoveAnalyzer()
 {
-	if (opponentFirstMove)
+	int eval = 0;
+	for (auto i = 0; i < width; i++)
 	{
-		std::cout << "Information about Player unknown" << '\n';
-		system("pause");
-	}
-	else
-	{
-		int eval = 0;
-		for (auto i = 0; i < width; i++)
+		for (auto j = 0; j < width; j++)
 		{
-			for (auto j = 0; j < width; j++)
-			{
-				if (gameMap.GetCell(i, j) != '0')
-				{
-					eval += Evaluation(i, j, ai);
-				}
-			}
+			eval += Evaluation(i, j);
 		}
-		std::cout << eval << '\n';
-		system("pause");
 	}
+	std::cout << eval << '\n';
+	system("pause");
 }
 
 bool gameController::DefineZeroStr(const std::string& string)

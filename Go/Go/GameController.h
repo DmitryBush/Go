@@ -20,14 +20,14 @@ private:
 	bool FindHistoryComb(const point& beg, const point& end);
 	char DefineMove();
 
-	int CheckPattern(const std::string& position, const bool& aiMove, const char& stone);
-	int Evaluation(const unsigned int x, const unsigned int y, const bool& ai);
+	int CheckPattern(const std::string& position, const char& stone);
+	int Evaluation(const unsigned int x, const unsigned int y);
 
 	void CheckInputValidation(int& x, int& y);
 	void CheckInputValidation(int& prevX_coord, int& prevY_coord,
 		int& x_coord, int& y_coord);
 
-	void DebugOutputMoveAnalyzer(const unsigned int x, const unsigned int y, const bool& ai);
+	void DebugOutputMoveAnalyzer();
 	bool DefineZeroStr(const std::string& string);
 public:
 	gameController(const unsigned int& x, const unsigned int& y);
