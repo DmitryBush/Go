@@ -56,5 +56,5 @@ public:
 
 	void TextModeOutput();
 
-	
+	~gameController();
 };

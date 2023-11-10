@@ -15,7 +15,7 @@ public:
 	void MoveStone(const int& PrevX_coord, const int& PrevY_coord,
 		const int& x_coord, const int& y_coord);
 
-	const char& GetCell(const int& x_coord, const int& y_coord) const;
+	const char GetCell(const int& x_coord, const int& y_coord) const;
 
 	void ResetField();
 

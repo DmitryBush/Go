@@ -18,6 +18,12 @@ gameController::gameController(const unsigned int& x, const unsigned int& y):
 	}
 }
 
+gameController::~gameController()
+{
+	delete[] usedStone;
+	delete[] playersScore;
+}
+
 void gameController::PlayerMove()
 {
 	while (true)
@@ -656,30 +662,37 @@ bool gameController::CheckPattern(const std::string& position, const GamePattern
 //	position.clear();
 //}
 
-//bool gameController::FindPrevPos(nTreeNode* node)
-//{
-//	for (auto i = 0; i < node->pos.GetCountOfElements(); i++)
-//	{
-//
-//	}
-//}
-//
-//int gameController::MiniMax(nTreeNode* node, const unsigned int depth)
-//{
-//	if (depth == 0)
-//		return Evaluation(node.GetX(), node.GetY());
-//
-//	if (FindPrevPos(node.GetX(), node.GetY()))
-//	{
-//
-//	}
-//	
-//	if (node.GetTurn() == 'a')
-//	{
-//
-//	}
-//	else
-//	{
-//
-//	}
-//}
+bool gameController::FindPrevPos(nTreeNode* node)
+{
+	for (auto i = 0; i < node->data.pos.GetCountOfElements(); i++)
+		if (node->data.currentPos == *node->data.pos[i])
+			return true;
+	return false;
+}
+
+int gameController::MiniMax(nTreeNode* node, const unsigned int depth)
+{
+	int evaluation = 0;
+	if (depth == 0)
+		return Evaluation(node->data.currentPos.GetX(), 
+			node->data.currentPos.GetY());
+
+	if (FindPrevPos(node))
+		return Evaluation(node->data.currentPos.GetX(),
+			node->data.currentPos.GetY());
+	else
+		node->data.pos.PushForward(node->data.currentPos.GetX(),
+			node->data.currentPos.GetY());
+	
+	if (node->data.currTurn == 'a')
+	{
+		evaluation = ~(1 << 31);
+	}
+	else
+	{
+		evaluation = 1 << 31;
+	}
+
+	node->data.pos.PopForward();
+	return evaluation;
+}
