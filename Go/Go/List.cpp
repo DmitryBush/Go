@@ -15,7 +15,7 @@ list::~list() { Clear(); }
 /*
 * Выделение памяти под новый элемент двунаправленного списка
 */
-bool list::PushForward(point beg, point end)
+bool list::PushForward(point beg, point end = point(0,0))
 {
 	if (head == nullptr)
 	{

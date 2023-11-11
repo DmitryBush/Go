@@ -4,7 +4,7 @@
 #include <conio.h>
 
 gameController::gameController(const unsigned int& x, const unsigned int& y):
-	width(x), height(y), gameMap(width, height), complete(false), opponentFirstMove(true)
+	width(x), height(y), gameMap(width, width), complete(false), opponentFirstMove(true)
 {
 	if (opponentFirstMove)
 	{
@@ -13,8 +13,8 @@ gameController::gameController(const unsigned int& x, const unsigned int& y):
 	}
 	else
 	{
-		aiStone = 'w';
-		playerStone = 'b';
+		aiStone = 'b';
+		playerStone = 'w';
 	}
 }
 
@@ -89,7 +89,8 @@ void gameController::PlayerMove(const bool setStone)
 	{
 		std::cout << "Введите предыдущюю строку и столбец" << '\n';
 		std::cin >> prevX_coord >> prevY_coord;
-		CheckInputValidation(prevX_coord, prevY_coord);
+		CheckInputValidation(prevX_coord, prevY_coord, 
+			"Введите предыдущюю строку и столбец");
 
 		system("cls");
 		TextModeOutput();
@@ -305,8 +306,15 @@ void gameController::TextModeOutput()
 		{
 			std::cout << gameMap.GetCell(i,j) << ' ';
 		}
-		std::cout << '\n';
+		std::cout << i + 1 << '\n';
 	}
+
+	std::cout << "  ";
+	for (int i = 1; i <= height; i++)
+	{
+		std::cout << i << ' ';
+	}
+	std::cout << '\n';
 }
 
 void gameController::CheckInputValidation(int& x, int& y)
@@ -325,32 +333,120 @@ void gameController::CheckInputValidation(int& x, int& y)
 	}
 }
 
-void gameController::CheckInputValidation(int& prevX_coord, int& prevY_coord,
-	int& x_coord, int& y_coord)
+void gameController::CheckInputValidation(int& x, int& y, std::string suggestion)
 {
-	while (std::cin.fail() 
-		|| gameMap.GetCell(prevX_coord - 1, prevY_coord - 1) != DefineMove()
-		|| !gameMap.EmptyCheck(x_coord - 1, y_coord - 1))
+	while (std::cin.fail() || !gameMap.GetCell(x - 1, y - 1))
 	{
 		system("cls");
 		std::cin.clear();
 		std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
-		if (gameMap.GetCell(prevX_coord - 1, prevY_coord - 1) != DefineMove())
+		TextModeOutput();
+		std::cout << "An error has occuried" << '\n'
+			<< suggestion << '\n';
+		std::cin >> x >> y;
+	}
+}
+
+listPositions& gameController::FindMovePos(const unsigned int& prevX, 
+	const unsigned int& prevY)
+{
+	listPositions pos;
+
+	for (auto i = -1; i < 2; i++)
+	{
+		if (gameMap.EmptyCheck(prevX + i, prevY))
+			pos.PushForward(prevX + i, prevY);
+		if (gameMap.EmptyCheck(prevX, prevY + i))
+			pos.PushForward(prevX, prevY + i);
+		if (gameMap.EmptyCheck(prevX + i, prevY + i))
+			pos.PushForward(prevX + i, prevY + i);
+		if (gameMap.EmptyCheck(prevX - i, prevY - i))
+			pos.PushForward(prevX - i, prevY - i);
+	}
+	return pos;
+}
+
+bool gameController::CheckCorrectMove(const int& prevX, const int& prevY,
+	const int& x, const int& y)
+{
+	for (int i = -1; i < 2; i++)
+	{
+		if (gameMap.EmptyCheck(prevX + i, prevY) && prevX + i == x
+			&& prevY == y)
+			return true;
+		if (gameMap.EmptyCheck(prevX, prevY + i) && prevX == x
+			&& prevY + i == y)
+			return true;
+		if (gameMap.EmptyCheck(prevX + i, prevY + i) && prevX + i == x
+			&& prevY + i == y)
+			return true;
+		if (gameMap.EmptyCheck(prevX - i, prevY - i) && prevX - i == x
+			&& prevY - i == y)
+			return true;
+	}
+	return false;
+}
+
+void gameController::CheckInputValidation(int& prevX, int& prevY,
+	int& x, int& y)
+{
+	/*while (std::cin.fail()
+		|| gameMap.GetCell(prevX - 1, prevY - 1) != DefineMove())
+	{
+		x = 0, y = 0;
+		system("cls");
+		std::cin.clear();
+		std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
+		TextModeOutput();
+		std::cout << "An error has occuried" << '\n'
+			<< "Введите заново предыдущую строку и столбец элемента" << '\n';
+		std::cin >> prevX >> prevY;
+	}*/
+
+	bool noValid = false;
+	while (std::cin.fail()
+		|| !gameMap.EmptyCheck(x - 1, y - 1)
+		|| (noValid = //!CheckCorrectMove(prevX, prevY, x, y) || 
+			gameMap.GetCell(prevX - 1, prevY - 1) != DefineMove()))
+	{
+		system("cls");
+		std::cin.clear();
+		std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
+		TextModeOutput();
+		if (noValid)
+		{
+			std::cout << "An error has occuried" << '\n'
+				<< "Введите заново предыдущую строку и столбец элемента" << '\n';
+			std::cin >> prevX >> prevY;
+		}
+		std::cout << "An error has occuried" << '\n'
+			<< "Введите заново строку и столбец" << '\n';
+		std::cin >> x >> y;
+	}
+
+	/*while (std::cin.fail() 
+		|| gameMap.GetCell(prevX - 1, prevY - 1) != DefineMove()
+		|| !gameMap.EmptyCheck(x - 1, y - 1))
+	{
+		system("cls");
+		std::cin.clear();
+		std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
+		if (gameMap.GetCell(prevX - 1, prevY - 1) != DefineMove())
 		{
 			TextModeOutput();
 			std::cout << "An error has occuried" << '\n'
 				<< "Введите заново предыдущую строку и столбец элемента" << '\n';
-			std::cin >> prevX_coord >> prevY_coord;
+			std::cin >> prevX >> prevY;
 		}
 
-		if (!gameMap.EmptyCheck(x_coord - 1, y_coord - 1))
+		if (!gameMap.EmptyCheck(x - 1, y - 1))
 		{
 			TextModeOutput();
 			std::cout << "An error has occuried" << '\n'
 				<< "Введите заново строку и столбец в перемещяемый элемент" << '\n';
-			std::cin >> x_coord >> y_coord;
+			std::cin >> x >> y;
 		}
-	}
+	}*/
 }
 
 /*
@@ -686,13 +782,143 @@ int gameController::MiniMax(nTreeNode* node, const unsigned int depth)
 	
 	if (node->data.currTurn == 'a')
 	{
-		evaluation = ~(1 << 31);
+		evaluation = 1 << 31;
+		for (auto i = 0; i < width; i++)
+		{
+			for (auto j = 0; j < width; j++)
+			{
+				if (usedStone[DefineIterator(false)] == 12
+					&& gameMap.GetCell(i, j) == playerStone)
+				{
+					MoveStageMinMax(node, evaluation, depth);
+					for (auto k = - 1; k < 2; k++)
+					{
+						if (CheckCorrectMove(i, j, i + k, j))
+						{
+							gameMap.MoveStone(i, j, i + k, j);
+							node->sons.Push(
+								nTreeNode(minMaxNode(node->data.pos, i, j, 'a')));
+							evaluation = std::max(
+								MiniMax(node->sons[node->sons.GetCountElements() - 1], depth - 1),
+								evaluation);
+							gameMap.MoveStone(i + k, j, i, j);
+						}
+						if (CheckCorrectMove(i, j, i, j + k))
+						{
+
+						}
+						if (CheckCorrectMove(i, j, i + k, j + k))
+						{
+
+						}
+						if (CheckCorrectMove(i, j, i - k, j - k))
+						{
+
+						}
+					}
+					evaluation = std::max(
+						MiniMax(node->sons[node->sons.GetCountElements() - 1], depth - 1),
+						evaluation);
+
+				}
+				else if (gameMap.EmptyCheck(i, j))
+				{
+					gameMap.SetStone(i, j, aiStone);
+					node->sons.Push(
+						nTreeNode(minMaxNode(node->data.pos, i, j, 'a')));
+					usedStone[DefineIterator(true)]++;
+					evaluation = std::max(
+						MiniMax(node->sons[node->sons.GetCountElements() - 1],depth - 1), 
+						evaluation);
+					gameMap.SetStone(i, j, ' ');
+					usedStone[DefineIterator(true)]--;
+				}
+			}
+		}
 	}
 	else
 	{
-		evaluation = 1 << 31;
+		evaluation = ~(1 << 31);
+		for (auto i = 0; i < width; i++)
+		{
+			for (auto j = 0; j < width; j++)
+			{
+				if (usedStone[DefineIterator(false)] == 12
+					&& gameMap.GetCell(i, j) == playerStone)
+				{
+					for (auto k = 0; k < width; k++)
+					{
+
+					}
+				}
+				else if (gameMap.EmptyCheck(i, j))
+				{
+					gameMap.SetStone(i, j, playerStone);
+					node->sons.Push(
+						nTreeNode(minMaxNode(node->data.pos, i, j, 'p')));
+					usedStone[DefineIterator(false)]++;
+					evaluation = std::min(
+						MiniMax(node->sons[node->sons.GetCountElements() - 1], depth - 1),
+						evaluation);
+					gameMap.SetStone(i, j, ' ');
+					usedStone[DefineIterator(false)]--;
+				}
+			}
+		}
 	}
 
 	node->data.pos.PopForward();
 	return evaluation;
+}
+
+int gameController::MoveStageMinMax(nTreeNode* node, point& prevPos,
+	int& evaluation, const unsigned int depth)
+{
+	for (auto k = -1; k < 2; k++)
+	{
+		if (CheckCorrectMove(prevPos.GetX(), prevPos.GetY(),
+			prevPos.GetX() + k, j))
+		{
+			gameMap.MoveStone(prevPos.GetX(), j, 
+				prevPos.GetX() + k, j);
+			node->sons.Push(
+				nTreeNode(minMaxNode(node->data.pos, i, j, 'a')));
+			evaluation = std::max(
+				MiniMax(node->sons[node->sons.GetCountElements() - 1], depth - 1),
+				evaluation);
+			gameMap.MoveStone(prevPos.GetX() + k, j,
+				prevPos.GetX(), j);
+		}
+		if (CheckCorrectMove(prevPos.GetX(), j,
+			prevPos.GetX(), j + k))
+		{
+
+		}
+		if (CheckCorrectMove(prevPos.GetX(), j, 
+			prevPos.GetX() + k, j + k))
+		{
+
+		}
+		if (CheckCorrectMove(prevPos.GetX(), j, 
+			prevPos.GetX() - k, j - k))
+		{
+
+		}
+	}
+}
+
+unsigned int gameController::DefineIterator(const bool defineAI)
+{
+	if (defineAI)
+	{
+		if (aiStone = 'w')
+			return 1;
+		return 0;
+	}
+	else
+	{
+		if (playerStone = 'w')
+			return 1;
+		return 0;
+	}
 }

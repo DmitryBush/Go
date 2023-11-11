@@ -11,6 +11,11 @@ enum GamePattern
 	LiveThree = 5, StrikingFour = 6, LiveFour = 7, LineFive = 8
 };
 
+enum InputValidation
+{
+	SetStone = 0, MoveStone = 1
+};
+
 class gameController
 {
 private:
@@ -38,9 +43,17 @@ private:
 		const char& stone);
 
 	int MiniMax(nTreeNode* node, const unsigned int depth);
+	int MoveStageMinMax(nTreeNode* node, point& prevPos, 
+		int& evaluation ,const unsigned int depth);
 	bool FindPrevPos(nTreeNode* node);
+	unsigned int DefineIterator(const bool defineAI);
 
 	void CheckInputValidation(int& x, int& y);
+	void CheckInputValidation(int& x, int& y, std::string suggestion);
+	listPositions& FindMovePos(const unsigned int& prevX,
+		const unsigned int& prevY);
+	bool CheckCorrectMove(const int& prevX, const int& prevY,
+		const int& x, const int& y);
 	void CheckInputValidation(int& prevX_coord, int& prevY_coord,
 		int& x_coord, int& y_coord);
 
