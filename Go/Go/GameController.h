@@ -43,10 +43,11 @@ private:
 		const char& stone);
 
 	int MiniMax(nTreeNode* node, const unsigned int depth);
-	int MoveStageMinMax(nTreeNode* node, point& prevPos, 
-		int& evaluation ,const unsigned int depth);
+	int MoveStageMinMax(nTreeNode* node, const int& prevX, const int& prevY,
+		int& evaluation, const unsigned int depth);
 	bool FindPrevPos(nTreeNode* node);
 	unsigned int DefineIterator(const bool defineAI);
+	char DefineNextMove(nTreeNode* node);
 
 	void CheckInputValidation(int& x, int& y);
 	void CheckInputValidation(int& x, int& y, std::string suggestion);

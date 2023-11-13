@@ -769,6 +769,11 @@ bool gameController::FindPrevPos(nTreeNode* node)
 int gameController::MiniMax(nTreeNode* node, const unsigned int depth)
 {
 	int evaluation = 0;
+	if (complete && node->data.currTurn == 'a')
+		return 1 << 31;
+	else if (complete)
+		return ~(1 << 31);
+
 	if (depth == 0)
 		return Evaluation(node->data.currentPos.GetX(), 
 			node->data.currentPos.GetY());
@@ -788,38 +793,9 @@ int gameController::MiniMax(nTreeNode* node, const unsigned int depth)
 			for (auto j = 0; j < width; j++)
 			{
 				if (usedStone[DefineIterator(false)] == 12
-					&& gameMap.GetCell(i, j) == playerStone)
+					&& gameMap.EmptyCheck(i, j))
 				{
-					MoveStageMinMax(node, evaluation, depth);
-					for (auto k = - 1; k < 2; k++)
-					{
-						if (CheckCorrectMove(i, j, i + k, j))
-						{
-							gameMap.MoveStone(i, j, i + k, j);
-							node->sons.Push(
-								nTreeNode(minMaxNode(node->data.pos, i, j, 'a')));
-							evaluation = std::max(
-								MiniMax(node->sons[node->sons.GetCountElements() - 1], depth - 1),
-								evaluation);
-							gameMap.MoveStone(i + k, j, i, j);
-						}
-						if (CheckCorrectMove(i, j, i, j + k))
-						{
-
-						}
-						if (CheckCorrectMove(i, j, i + k, j + k))
-						{
-
-						}
-						if (CheckCorrectMove(i, j, i - k, j - k))
-						{
-
-						}
-					}
-					evaluation = std::max(
-						MiniMax(node->sons[node->sons.GetCountElements() - 1], depth - 1),
-						evaluation);
-
+					MoveStageMinMax(node, i, j, evaluation, depth);
 				}
 				else if (gameMap.EmptyCheck(i, j))
 				{
@@ -827,6 +803,7 @@ int gameController::MiniMax(nTreeNode* node, const unsigned int depth)
 					node->sons.Push(
 						nTreeNode(minMaxNode(node->data.pos, i, j, 'a')));
 					usedStone[DefineIterator(true)]++;
+					Update();
 					evaluation = std::max(
 						MiniMax(node->sons[node->sons.GetCountElements() - 1],depth - 1), 
 						evaluation);
@@ -846,10 +823,7 @@ int gameController::MiniMax(nTreeNode* node, const unsigned int depth)
 				if (usedStone[DefineIterator(false)] == 12
 					&& gameMap.GetCell(i, j) == playerStone)
 				{
-					for (auto k = 0; k < width; k++)
-					{
-
-					}
+					MoveStageMinMax(node, i, j, evaluation, depth);
 				}
 				else if (gameMap.EmptyCheck(i, j))
 				{
@@ -857,6 +831,7 @@ int gameController::MiniMax(nTreeNode* node, const unsigned int depth)
 					node->sons.Push(
 						nTreeNode(minMaxNode(node->data.pos, i, j, 'p')));
 					usedStone[DefineIterator(false)]++;
+					Update();
 					evaluation = std::min(
 						MiniMax(node->sons[node->sons.GetCountElements() - 1], depth - 1),
 						evaluation);
@@ -871,40 +846,65 @@ int gameController::MiniMax(nTreeNode* node, const unsigned int depth)
 	return evaluation;
 }
 
-int gameController::MoveStageMinMax(nTreeNode* node, point& prevPos,
+int gameController::MoveStageMinMax(nTreeNode* node, const int& prevX, const int& prevY,
 	int& evaluation, const unsigned int depth)
 {
 	for (auto k = -1; k < 2; k++)
 	{
-		if (CheckCorrectMove(prevPos.GetX(), prevPos.GetY(),
-			prevPos.GetX() + k, j))
+		if (gameMap.GetCell(prevX + k, prevY) == node->data.currTurn)
 		{
-			gameMap.MoveStone(prevPos.GetX(), j, 
-				prevPos.GetX() + k, j);
+			gameMap.MoveStone(prevX, prevY,
+				prevX + k, prevY);
 			node->sons.Push(
-				nTreeNode(minMaxNode(node->data.pos, i, j, 'a')));
+				nTreeNode(minMaxNode(node->data.pos, 
+					prevX + k, prevY, 'a')));
 			evaluation = std::max(
 				MiniMax(node->sons[node->sons.GetCountElements() - 1], depth - 1),
 				evaluation);
-			gameMap.MoveStone(prevPos.GetX() + k, j,
-				prevPos.GetX(), j);
+			gameMap.MoveStone(prevX + k, prevY,
+				prevX, prevY);
 		}
-		if (CheckCorrectMove(prevPos.GetX(), j,
-			prevPos.GetX(), j + k))
+		if (gameMap.GetCell(prevX, prevY + k) == node->data.currTurn)
 		{
-
+			gameMap.MoveStone(prevX, prevY,
+				prevX, prevY + k);
+			node->sons.Push(
+				nTreeNode(minMaxNode(node->data.pos, 
+					prevX, prevY + k, 'a')));
+			evaluation = std::max(
+				MiniMax(node->sons[node->sons.GetCountElements() - 1], depth - 1),
+				evaluation);
+			gameMap.MoveStone(prevX, prevY + k,
+				prevX, prevY);
 		}
-		if (CheckCorrectMove(prevPos.GetX(), j, 
-			prevPos.GetX() + k, j + k))
+		if (gameMap.GetCell(prevX + k, prevY + k) == node->data.currTurn)
 		{
-
+			gameMap.MoveStone(prevX, prevY,
+				prevX + k, prevY + k);
+			node->sons.Push(
+				nTreeNode(minMaxNode(node->data.pos,
+					prevX + k, prevY + k, 'a')));
+			evaluation = std::max(
+				MiniMax(node->sons[node->sons.GetCountElements() - 1], depth - 1),
+				evaluation);
+			gameMap.MoveStone(prevX + k, prevY + k,
+				prevX, prevY);
 		}
-		if (CheckCorrectMove(prevPos.GetX(), j, 
-			prevPos.GetX() - k, j - k))
+		if (gameMap.GetCell(prevX - k, prevY - k) == node->data.currTurn)
 		{
-
+			gameMap.MoveStone(prevX, prevY,
+				prevX - k, prevY - k);
+			node->sons.Push(
+				nTreeNode(minMaxNode(node->data.pos,
+					prevX - k, prevY - k, 'a')));
+			evaluation = std::max(
+				MiniMax(node->sons[node->sons.GetCountElements() - 1], depth - 1),
+				evaluation);
+			gameMap.MoveStone(prevX - k, prevY - k,
+				prevX, prevY);
 		}
 	}
+	return evaluation;
 }
 
 unsigned int gameController::DefineIterator(const bool defineAI)
@@ -921,4 +921,11 @@ unsigned int gameController::DefineIterator(const bool defineAI)
 			return 1;
 		return 0;
 	}
+}
+
+char DefineNextMove(nTreeNode* node)
+{
+	if (node->data.currTurn == 'a')
+		return 'p';
+	return 'a';
 }
