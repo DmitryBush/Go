@@ -42,6 +42,9 @@
     <ClCompile Include="ListPosition.cpp">
       <Filter>Исходные файлы\Structure</Filter>
     </ClCompile>
+    <ClCompile Include="HistComb.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameController.h">
@@ -63,6 +66,12 @@
       <Filter>Файлы заголовков\Structure</Filter>
     </ClInclude>
     <ClInclude Include="ListPositions.h">
+      <Filter>Файлы заголовков\Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="MinMaxNode.h">
+      <Filter>Файлы заголовков\Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="HistComb.h">
       <Filter>Файлы заголовков\Structure</Filter>
     </ClInclude>
   </ItemGroup>

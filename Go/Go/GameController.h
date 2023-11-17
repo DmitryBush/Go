@@ -2,7 +2,9 @@
 #include "Map.h"
 #include "List.h"
 #include <string>
-#include "nTree.h"
+#include "ListPositions.h"
+#include "MinMaxNode.h"
+#include "HistComb.h"
 #include <functional>
 
 enum GamePattern
@@ -25,14 +27,13 @@ private:
 	bool complete;
 	bool opponentFirstMove;
 
-	list playersHistComb[2];
+	histComb playersHistComb[2];
 	map gameMap;
-
-	nTree MinMaxTree;
 
 	void PlayerMove(const bool setStone);
 	int Update();
-	bool FindHistoryComb(const point& beg, const point& end);
+	//bool FindHistoryComb(const point& beg, const point& end);
+	bool FindHistoryComb(const line& comb, ListOrient orient);
 	char DefineMove();
 
 	int CheckPattern(const std::string& position, const char& stone);
@@ -42,12 +43,12 @@ private:
 	bool CheckPattern(const std::string& position, const GamePattern pattern,
 		const char& stone);
 
-	int MiniMax(nTreeNode* node, const unsigned int depth);
-	int MoveStageMinMax(nTreeNode* node, const int& prevX, const int& prevY,
+	int MiniMax(minMaxNode* node, const unsigned int depth);
+	int MoveStageMinMax(minMaxNode* node, const int& prevX, const int& prevY,
 		int& evaluation, const unsigned int depth);
-	bool FindPrevPos(nTreeNode* node);
+	bool FindPrevPos(minMaxNode* node);
 	unsigned int DefineIterator(const bool defineAI);
-	char DefineNextMove(nTreeNode* node);
+	char DefineNextMove(minMaxNode* node);
 
 	void CheckInputValidation(int& x, int& y);
 	void CheckInputValidation(int& x, int& y, std::string suggestion);

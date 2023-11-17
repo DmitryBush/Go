@@ -15,13 +15,13 @@ list::~list() { Clear(); }
 /*
 * Выделение памяти под новый элемент двунаправленного списка
 */
-bool list::PushForward(point beg, point end = point(0,0))
+bool list::PushForward(line dots)
 {
 	if (head == nullptr)
 	{
 		try
 		{
-			head = new node(beg, end);
+			head = new node(dots);
 			countElements++;			
 			return true;
 		}
@@ -37,7 +37,7 @@ bool list::PushForward(point beg, point end = point(0,0))
 		try
 		{	// Попытка выделения памяти под узел с переданным параметром 
 			// и его связь со списком
-			node* curr = new node(beg, end, head);
+			node* curr = new node(dots, head);
 			head->prev = curr;					
 
 			head = curr;
@@ -268,7 +268,7 @@ void list::ResetList()
 /*
 * Перегрузка оператора квадратных скобок, который возвращяет указатель на элемент
 */
-point* list::operator[](const unsigned int index)
+line* list::operator[](const unsigned int index)
 {
 	if (index < 0 || index > countElements)
 		throw("Invalid index");
@@ -283,52 +283,7 @@ point* list::operator[](const unsigned int index)
 		if (!curr) 
 			throw("Invalid index");
 	}
-	return curr->val;
-}
-
-/*
-* Задание 4:
-* В списке А размера N необходимо каждый элемент заменить на ближайший следующий за ним элемент, 
-* который больше его. Если такого элемента нет, то заменить его на ноль.
-*/
-void list::Task()
-{
-	if (head)
-	{
-		if (head->prev)		// Если Голова списка не в изначальном положение
-			ResetList();
-
-		node* curr = head;
-		bool foundElem = false;
-		while (curr->next)
-		{
-			node* next = curr;
-			while (next->next)		// Поиск элемента, который будет больше текущего
-			{
-				if (next->val > curr->val)
-				{
-					curr->val = next->val;
-					foundElem = true;
-					break;
-				}
-				else
-				{
-					next = next->next;
-				}
-			}
-
-			if (!foundElem)			// По условию задачи, если элемент не будет найден
-				curr->val = 0;	// То он заменяется нулем
-
-			foundElem = false;
-			curr = curr->next;
-		}
-		curr->val = 0;		// Последний элемент обязательно будет нулем
-	}
-	else
-	{
-		std::cout << "List is empty" << '\n';
-	}
+	return &curr->val;
 }
 
 /*
@@ -348,11 +303,35 @@ void list::Print()
 	{
 		while (curr->next)
 		{
-			std::cout << curr->val[0].GetX() << ' ' << curr->val[0].GetY() << ' '
-				<< curr->val[1].GetX() << ' ' << curr->val[1].GetY() << '\n';
+			for (auto i = 0; i < 5; i++)
+			{
+				std::cout << curr->val.dots[i].GetX()
+					<< ' ' << curr->val.dots[i].GetY() << ' ';
+			}
+			std::cout << '\n';
 			curr = curr->next;
 		}
-		std::cout << curr->val[0].GetX() << ' ' << curr->val[0].GetY() << ' '
-			<< curr->val[1].GetX() << ' ' << curr->val[1].GetY() << '\n';
+		for (auto i = 0; i < 5; i++)
+		{
+			std::cout << curr->val.dots[i].GetX()
+				<< ' ' << curr->val.dots[i].GetY() << ' ';
+		}
+		std::cout << '\n';
+		curr = curr->next;
 	}
+}
+
+bool operator==(const line& arg_1, const line& arg_2)
+{
+	for (auto i = 0; i < 5; i++)
+	{
+		for (auto j = 0; j < 5; j++)
+		{
+			if (arg_1.dots[i] == arg_2.dots[j])
+			{
+				return true;
+			}
+		}
+	}
+	return false;
 }

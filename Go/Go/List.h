@@ -1,6 +1,32 @@
 #pragma once
 #include "Point.h"
 
+class line
+{
+public:
+	point dots[5];
+
+	line(point first, point second, point third, point fourth,
+		point five)
+	{
+		dots[0].SetPoint(first.GetX(), first.GetY());
+		dots[1].SetPoint(second.GetX(), second.GetY());
+		dots[2].SetPoint(third.GetX(), third.GetY());
+		dots[3].SetPoint(fourth.GetX(), fourth.GetY());
+		dots[4].SetPoint(five.GetX(), five.GetY());
+	}
+
+	line()
+	{
+		dots[0].SetPoint(0, 0);
+		dots[1].SetPoint(0, 0);
+		dots[2].SetPoint(0, 0);
+		dots[3].SetPoint(0, 0);
+		dots[4].SetPoint(0, 0);
+	}
+};
+bool operator==(const line& arg_1, const line& arg_2);
+
 class list
 {
 private:
@@ -12,14 +38,20 @@ private:
 	class node
 	{
 	public:
-		point* val;
+		line val;
 		node* prev, *next;
 
-		node(point beg, point end, node* next = nullptr):
-			next(next), prev(nullptr) 
+		node(point first, point second, point third,
+			point fourth, point five, node* next = nullptr) :
+			next(next), prev(nullptr), val(first, second, third, fourth, five) {}
+
+		node(line points, node* next = nullptr) :
+			next(next), prev(nullptr)
 		{
-			val = new point[2];
-			val[0].SetPoint(beg.GetX(),beg.GetY()); val[1].SetPoint(end.GetX(), end.GetY());
+			for (auto i = 0; i < 5; i++)
+			{
+				val.dots[i].SetPoint(points.dots[i].GetX(), points.dots[i].GetY());
+			}
 		}
 	};
 	
@@ -32,7 +64,9 @@ public:
 
 	int GetCountOfElements() const { return countElements; }
 
-	bool PushForward(point beg, point end);
+	/*bool PushForward(point first, point second, point third,
+		point fourth, point five);*/
+	bool PushForward(line dots);
 
 	bool PopForward(const unsigned int& id_Elem);
 	bool PopForward();
@@ -41,8 +75,7 @@ public:
 	bool IsEmpty() const { return head == nullptr; }
 	void ResetList();
 
-	point* operator[] (const unsigned int index);
+	line* operator[] (const unsigned int index);
 
-	void Task();
 	void Print();
 };

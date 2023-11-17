@@ -131,6 +131,7 @@
   <ItemGroup>
     <ClCompile Include="GameController.cpp" />
     <ClCompile Include="Go.cpp" />
+    <ClCompile Include="HistComb.cpp" />
     <ClCompile Include="List.cpp" />
     <ClCompile Include="ListPosition.cpp" />
     <ClCompile Include="Map.cpp" />
@@ -140,9 +141,11 @@
   <ItemGroup>
     <ClInclude Include="DynamicArr.h" />
     <ClInclude Include="GameController.h" />
+    <ClInclude Include="HistComb.h" />
     <ClInclude Include="List.h" />
     <ClInclude Include="ListPositions.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="MinMaxNode.h" />
     <ClInclude Include="nTree.h" />
     <ClInclude Include="Point.h" />
   </ItemGroup>
