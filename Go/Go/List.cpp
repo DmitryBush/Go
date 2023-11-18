@@ -29,6 +29,7 @@ bool list::PushForward(line dots)
 		{
 			std::cout << "An error has occured" << "(code: " << ex.what()
 				<< "Not enough free RAM. Close other programs and try again" << std::endl;
+			throw("bad allocation");
 			return false;
 		}
 	}
@@ -48,6 +49,7 @@ bool list::PushForward(line dots)
 		{
 			std::cout << "An error has occured" << "(code: " << ex.what()
 				<< "Not enough free RAM. Close other programs and try again" << std::endl;
+			throw("bad allocation");
 			return false;
 		}
 	}

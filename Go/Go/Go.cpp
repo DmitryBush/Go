@@ -7,7 +7,7 @@
 int main()
 {
 	system("chcp 1251");
-    gameController controller(10, 10);
+    gameController controller(6, 6);
 
 	controller.PlayerMove();
 	

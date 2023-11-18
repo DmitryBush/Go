@@ -29,6 +29,7 @@ list& histComb::GetList(ListOrient orient)
 		return combinations[3];
 		break;
 	default:
+		throw("Invalid index");
 		break;
 	}
 }

@@ -135,7 +135,6 @@
     <ClCompile Include="List.cpp" />
     <ClCompile Include="ListPosition.cpp" />
     <ClCompile Include="Map.cpp" />
-    <ClCompile Include="nTree.cpp" />
     <ClCompile Include="Point.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -146,7 +145,6 @@
     <ClInclude Include="ListPositions.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MinMaxNode.h" />
-    <ClInclude Include="nTree.h" />
     <ClInclude Include="Point.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

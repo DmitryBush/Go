@@ -36,9 +36,6 @@
     <ClCompile Include="List.cpp">
       <Filter>Исходные файлы\Structure</Filter>
     </ClCompile>
-    <ClCompile Include="nTree.cpp">
-      <Filter>Исходные файлы\Structure</Filter>
-    </ClCompile>
     <ClCompile Include="ListPosition.cpp">
       <Filter>Исходные файлы\Structure</Filter>
     </ClCompile>
@@ -55,9 +52,6 @@
     </ClInclude>
     <ClInclude Include="Point.h">
       <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="nTree.h">
-      <Filter>Файлы заголовков\Structure</Filter>
     </ClInclude>
     <ClInclude Include="DynamicArr.h">
       <Filter>Файлы заголовков\Structure</Filter>

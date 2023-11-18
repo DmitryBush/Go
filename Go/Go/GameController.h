@@ -32,6 +32,7 @@ private:
 
 	void PlayerMove(const bool setStone);
 	int Update();
+	bool completeCheck();
 	//bool FindHistoryComb(const point& beg, const point& end);
 	bool FindHistoryComb(const line& comb, ListOrient orient);
 	char DefineMove();
@@ -43,16 +44,19 @@ private:
 	bool CheckPattern(const std::string& position, const GamePattern pattern,
 		const char& stone);
 
-	int MiniMax(minMaxNode* node, const unsigned int depth);
+	void aiMove(const int& x, const int& y);
+	int MiniMax(minMaxNode* node, int** matrix, const unsigned int depth);
 	int MoveStageMinMax(minMaxNode* node, const int& prevX, const int& prevY,
-		int& evaluation, const unsigned int depth);
-	bool FindPrevPos(minMaxNode* node);
+		int& evaluation, const unsigned int depth, int** matrix);
+	bool FindPrevPos(const minMaxNode* node) const;
 	unsigned int DefineIterator(const bool defineAI);
+	unsigned int DefineIterator(minMaxNode* node);
 	char DefineNextMove(minMaxNode* node);
+	int* MinMaxUpdate(minMaxNode* node);
 
 	void CheckInputValidation(int& x, int& y);
 	void CheckInputValidation(int& x, int& y, std::string suggestion);
-	listPositions& FindMovePos(const unsigned int& prevX,
+	listPositions FindMovePos(const unsigned int& prevX,
 		const unsigned int& prevY);
 	bool CheckCorrectMove(const int& prevX, const int& prevY,
 		const int& x, const int& y);
