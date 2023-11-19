@@ -58,6 +58,8 @@ private:
 	void CheckInputValidation(int& x, int& y, std::string suggestion);
 	listPositions FindMovePos(const unsigned int& prevX,
 		const unsigned int& prevY);
+	int FindBestPosition(listPositions& pos);
+	int FindMoveBestPosition(listPositions& pos);
 	bool CheckCorrectMove(const int& prevX, const int& prevY,
 		const int& x, const int& y);
 	void CheckInputValidation(int& prevX_coord, int& prevY_coord,
