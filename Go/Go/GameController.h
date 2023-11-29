@@ -5,6 +5,7 @@
 #include "ListPositions.h"
 #include "MinMaxNode.h"
 #include "HistComb.h"
+#include "ComplexNumb.h"
 #include <functional>
 
 enum GamePattern
@@ -50,7 +51,7 @@ private:
 	void aiMove(const int& x, const int& y);
 	int AlphaBeta(minMaxNode* node, int& alpha, int& beta
 		, int** matrix, const unsigned int depth);
-	int MoveStagePositions(minMaxNode* node,
+	listPositions& MoveStagePositions(minMaxNode* node,
 		const int& emptX, const int& emptY);
 
 	bool FindPrevPos(const minMaxNode* node) const;
