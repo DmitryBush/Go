@@ -35,22 +35,32 @@ private:
 	bool completeCheck();
 	//bool FindHistoryComb(const point& beg, const point& end);
 	bool FindHistoryComb(const line& comb, ListOrient orient);
+	bool FindHistoryComb(const line& comb, ListOrient orient, 
+		const unsigned int iter);
 	char DefineMove();
 
 	int CheckPattern(const std::string& position, const char& stone);
 	int Evaluation(const unsigned int x, const unsigned int y);
+	int EvaluateField();
 	//bool IsScoreLine(const unsigned int& x, const unsigned int& y);
 
 	bool CheckPattern(const std::string& position, const GamePattern pattern,
 		const char& stone);
 
 	void aiMove(const int& x, const int& y);
-	int MiniMax(minMaxNode* node, int** matrix, const unsigned int depth);
-	int MoveStageMinMax(minMaxNode* node, const int& prevX, const int& prevY,
-		int& evaluation, const unsigned int depth, int** matrix);
+	int AlphaBeta(minMaxNode* node, int& alpha, int& beta
+		, int** matrix, const unsigned int depth);
+	int MoveStagePositions(minMaxNode* node,
+		const int& emptX, const int& emptY);
+
 	bool FindPrevPos(const minMaxNode* node) const;
 	unsigned int DefineIterator(const bool defineAI);
-	unsigned int DefineIterator(minMaxNode* node);
+	unsigned int DefineIterator(const minMaxNode* node,
+		const bool defineAI) const;
+
+	char DefineMove(const minMaxNode* node) const;
+	unsigned int DefineIteratorHelper(const char stone) const;
+	unsigned int DefineNextMoveIterator(minMaxNode* node);
 	char DefineNextMove(minMaxNode* node);
 	int* MinMaxUpdate(minMaxNode* node);
 

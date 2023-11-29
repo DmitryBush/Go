@@ -193,7 +193,7 @@ bool list::PopForward()
 	if (head == nullptr)
 	{
 		std::cout << "List is empty" << std::endl;
-		return false;
+		throw("empty list");
 	}
 	else
 	{
