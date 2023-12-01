@@ -325,7 +325,12 @@ void list::Print()
 
 bool operator==(const line& arg_1, const line& arg_2)
 {
-	for (auto i = 0; i < 5; i++)
+	if (arg_1.dots[0] == arg_2.dots[0] &&
+		arg_1.dots[4] == arg_2.dots[4])
+	{
+		return true;
+	}
+	/*for (auto i = 0; i < 5; i++)
 	{
 		for (auto j = 0; j < 5; j++)
 		{
@@ -334,6 +339,6 @@ bool operator==(const line& arg_1, const line& arg_2)
 				return true;
 			}
 		}
-	}
+	}*/
 	return false;
 }

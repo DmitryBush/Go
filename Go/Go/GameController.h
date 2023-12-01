@@ -5,19 +5,6 @@
 #include "ListPositions.h"
 #include "MinMaxNode.h"
 #include "HistComb.h"
-#include "ComplexNumb.h"
-#include <functional>
-
-enum GamePattern
-{
-	NoStone = 0, OneStone = 1, SleepingTwo = 2, LiveTwo = 3, SleepingThree = 4,
-	LiveThree = 5, StrikingFour = 6, LiveFour = 7, LineFive = 8
-};
-
-enum InputValidation
-{
-	SetStone = 0, MoveStone = 1
-};
 
 class gameController
 {
@@ -43,16 +30,21 @@ private:
 	int CheckPattern(const std::string& position, const char& stone);
 	int Evaluation(const unsigned int x, const unsigned int y);
 	int EvaluateField();
-	//bool IsScoreLine(const unsigned int& x, const unsigned int& y);
+	
 
-	bool CheckPattern(const std::string& position, const GamePattern pattern,
-		const char& stone);
+	/*bool CheckPattern(const std::string& position, const GamePattern pattern,
+		const char& stone);*/
 
 	void aiMove(const int& x, const int& y);
+	void aiMove(int* prevCoord);
+
 	int AlphaBeta(minMaxNode* node, int& alpha, int& beta
-		, int** matrix, const unsigned int depth);
-	listPositions& MoveStagePositions(minMaxNode* node,
+		, point** matrix, const unsigned int depth);
+	int MoveAlphaBeta(minMaxNode* node, int& alpha, int& beta
+		, point** matrix, const unsigned int depth);
+	void MoveStagePositions(minMaxNode* node, listPositions& pos,
 		const int& emptX, const int& emptY);
+	void OriginSearch(minMaxNode* node, point** matrix, int val);
 
 	bool FindPrevPos(const minMaxNode* node) const;
 	unsigned int DefineIterator(const bool defineAI);
@@ -70,7 +62,8 @@ private:
 	listPositions FindMovePos(const unsigned int& prevX,
 		const unsigned int& prevY);
 	int FindBestPosition(listPositions& pos);
-	int FindMoveBestPosition(listPositions& pos);
+	int* FindMoveBestPosition(listPositions& pos);
+
 	bool CheckCorrectMove(const int& prevX, const int& prevY,
 		const int& x, const int& y);
 	void CheckInputValidation(int& prevX_coord, int& prevY_coord,
@@ -87,6 +80,7 @@ public:
 	void Restart();
 
 	void TextModeOutput();
+	void GetResults();
 
 	~gameController();
 };

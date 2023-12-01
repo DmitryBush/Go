@@ -40,7 +40,7 @@
       <Filter>Исходные файлы\Structure</Filter>
     </ClCompile>
     <ClCompile Include="HistComb.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>Исходные файлы\Structure</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -52,9 +52,6 @@
     </ClInclude>
     <ClInclude Include="Point.h">
       <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="DynamicArr.h">
-      <Filter>Файлы заголовков\Structure</Filter>
     </ClInclude>
     <ClInclude Include="List.h">
       <Filter>Файлы заголовков\Structure</Filter>

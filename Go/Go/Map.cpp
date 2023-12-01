@@ -24,7 +24,10 @@ bool map::EmptyCheck(const int x_elem, const int y_elem) const
 	return false;
 }
 
-map::map(const unsigned int& width, const unsigned int& height): 
+map::map(): width(0), height(0), field(nullptr)
+{}
+
+map::map(const unsigned int& width, const unsigned int& height):
 	width(width), height(height)
 {
 	AllocateMemory();
@@ -70,6 +73,32 @@ const char map::GetCell(const int& x_coord, const int& y_coord) const
 	if ((x_coord >= 0 && x_coord < width) && (y_coord >= 0 && y_coord < height))
 		return field[x_coord][y_coord];
 	return 0;
+}
+
+void map::ImportField(const map& field)
+{
+	width = field.width; height = field.height;
+	AllocateMemory();
+
+	ResetField();
+	for (auto i = 0; i < width; i++)
+	{
+		for (auto j = 0; j < height; j++)
+		{
+			this->field[i][j] = field.field[i][j];
+		}
+	}
+}
+
+void map::Clear()
+{
+	if (field)
+	{
+		for (int i = 0; i < width; i++)
+			delete field[i];
+
+		delete[] field;
+	}
 }
 
 void map::ResetField()

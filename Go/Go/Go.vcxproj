@@ -138,7 +138,6 @@
     <ClCompile Include="Point.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DynamicArr.h" />
     <ClInclude Include="GameController.h" />
     <ClInclude Include="HistComb.h" />
     <ClInclude Include="List.h" />
