@@ -330,15 +330,5 @@ bool operator==(const line& arg_1, const line& arg_2)
 	{
 		return true;
 	}
-	/*for (auto i = 0; i < 5; i++)
-	{
-		for (auto j = 0; j < 5; j++)
-		{
-			if (arg_1.dots[i] == arg_2.dots[j])
-			{
-				return true;
-			}
-		}
-	}*/
 	return false;
 }

@@ -1,6 +1,9 @@
 #include "Map.h"
 #include <iostream>
 
+/*
+* ћетод выделени€ пам€ти
+*/
 bool map::AllocateMemory()
 {
 	field = new char* [width];
@@ -13,6 +16,9 @@ bool map::AllocateMemory()
 	return true;
 }
 
+/*
+* ¬спомогательный метод провер€ющий пуста€ ли €чейка
+*/
 bool map::EmptyCheck(const int x_elem, const int y_elem) const
 {
 	if ((x_elem >= 0 && x_elem < width) &&
@@ -46,6 +52,9 @@ map::~map()
 	}
 }
 
+/*
+* ћетод став€щий камень в €чейку
+*/
 bool map::SetStone(const int& x_coord, const int& y_coord, const char& stone)
 {
 	if ((x_coord >= 0 && x_coord < width) && (y_coord >= 0 && y_coord < height))
@@ -56,6 +65,9 @@ bool map::SetStone(const int& x_coord, const int& y_coord, const char& stone)
 	return false;
 }
 
+/*
+* ћетод перемещающий камень из одной €чейки в другую
+*/
 void map::MoveStone(const int& PrevX_coord, const int& PrevY_coord, 
 	const int& x_coord, const int& y_coord)
 {
@@ -68,6 +80,9 @@ void map::MoveStone(const int& PrevX_coord, const int& PrevY_coord,
 		}
 }
 
+/*
+* ћетод дл€ получени содержимого пол€
+*/
 const char map::GetCell(const int& x_coord, const int& y_coord) const
 {
 	if ((x_coord >= 0 && x_coord < width) && (y_coord >= 0 && y_coord < height))
@@ -75,6 +90,9 @@ const char map::GetCell(const int& x_coord, const int& y_coord) const
 	return 0;
 }
 
+/*
+* ћетод дл€ создани€ копии пол€
+*/
 void map::ImportField(const map& field)
 {
 	width = field.width; height = field.height;
@@ -101,6 +119,9 @@ void map::Clear()
 	}
 }
 
+/*
+* ћетод сброса пол€
+*/
 void map::ResetField()
 {
 	for (int i = 0; i < width; i++)

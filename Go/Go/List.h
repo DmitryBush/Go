@@ -1,6 +1,9 @@
 #pragma once
 #include "Point.h"
 
+/*
+* Класс линия содержащий 5 точек
+*/
 class line
 {
 public:

@@ -16,6 +16,4 @@ public:
 
 	void Clear();
 	list& GetList(ListOrient orient);
-
-	~histComb();
 };

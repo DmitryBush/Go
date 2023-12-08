@@ -4,6 +4,9 @@ histComb::histComb()
 {
 }
 
+/*
+* Метод для очищения списков
+*/
 void histComb::Clear()
 {
 	for (auto i = 0; i < 4; i++)
@@ -12,6 +15,9 @@ void histComb::Clear()
 	}
 }
 
+/*
+* Метод для получения доступа к спискам комбинаций
+*/
 list& histComb::GetList(ListOrient orient)
 {
 	switch (orient)
@@ -32,8 +38,4 @@ list& histComb::GetList(ListOrient orient)
 		throw("Invalid index");
 		break;
 	}
-}
-
-histComb::~histComb()
-{
 }
