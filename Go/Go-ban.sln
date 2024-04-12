@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32825.248
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Go", "Go\Go.vcxproj", "{032FF267-99A6-432E-BB82-AE4E2E430E08}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Go-ban", "Go\Go.vcxproj", "{032FF267-99A6-432E-BB82-AE4E2E430E08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -18,6 +18,12 @@ public:
 	void SetPoint(int x, int y);
 	void ShowPoint();
 
+	/*
+	* Удаление оператора = для избавления от случайных преобразований
+	*/
+	point& operator=(int) = delete;
 };
-
+/*
+* Перегрузка оператора == для сравнения точек
+*/
 bool operator==(point arg_1, point arg_2);

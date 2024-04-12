@@ -1,27 +1,33 @@
-#include "List.h"
+#include "ListPositions.h"
 #include <iostream>
 #include <conio.h>
 
 /*
 * Конструктор без параметров
 */
-list::list() : countElements(0) { head = nullptr; }
+listPositions::listPositions() : countElements(0) { head = nullptr; }
+
+listPositions::listPositions(const listPositions& arg)
+{
+	head = arg.head;
+	countElements = arg.GetCountOfElements();
+}
 
 /*
 * Деструктор, очищающий список
 */
-list::~list() { Clear(); }
+listPositions::~listPositions() { Clear(); }
 
 /*
 * Выделение памяти под новый элемент двунаправленного списка
 */
-bool list::PushForward(line dots)
+bool listPositions::PushForward(const int x = 0, const int y = 0)
 {
 	if (head == nullptr)
 	{
 		try
 		{
-			head = new node(dots);
+			head = new node(x, y);
 			countElements++;			
 			return true;
 		}
@@ -29,7 +35,6 @@ bool list::PushForward(line dots)
 		{
 			std::cout << "An error has occured" << "(code: " << ex.what()
 				<< "Not enough free RAM. Close other programs and try again" << std::endl;
-			throw("bad allocation");
 			return false;
 		}
 	}
@@ -38,7 +43,7 @@ bool list::PushForward(line dots)
 		try
 		{	// Попытка выделения памяти под узел с переданным параметром 
 			// и его связь со списком
-			node* curr = new node(dots, head);
+			node* curr = new node(x, y, head);
 			head->prev = curr;					
 
 			head = curr;
@@ -49,7 +54,6 @@ bool list::PushForward(line dots)
 		{
 			std::cout << "An error has occured" << "(code: " << ex.what()
 				<< "Not enough free RAM. Close other programs and try again" << std::endl;
-			throw("bad allocation");
 			return false;
 		}
 	}
@@ -58,7 +62,7 @@ bool list::PushForward(line dots)
 /*
 * Удаление элемента двунаправленного списка, по указанному индексу
 */
-bool list::PopForward(const unsigned int& index)
+bool listPositions::PopForward(const unsigned int& index)
 {
 	int a = 1;
 	node* del;
@@ -186,14 +190,14 @@ bool list::PopForward(const unsigned int& index)
 /*
 * Удаление текущего элемента двунаправленного списка
 */
-bool list::PopForward()
+bool listPositions::PopForward()
 {
 	node* del;
 
 	if (head == nullptr)
 	{
 		std::cout << "List is empty" << std::endl;
-		throw("empty list");
+		return false;
 	}
 	else
 	{
@@ -234,7 +238,7 @@ bool list::PopForward()
 /*
 * Метод очищения списка
 */
-void list::Clear()
+void listPositions::Clear()
 {
 	node* del;
 	if (head == nullptr) { return; }
@@ -255,7 +259,7 @@ void list::Clear()
 /*
 * Переводит указатель головы списка в изначальное состояние
 */
-void list::ResetList()
+void listPositions::ResetList()
 {
 	if (head == nullptr) {}
 	else
@@ -270,7 +274,7 @@ void list::ResetList()
 /*
 * Перегрузка оператора квадратных скобок, который возвращяет указатель на элемент
 */
-line* list::operator[](const unsigned int index)
+point* listPositions::operator[](const unsigned int index)
 {
 	if (index < 0 || index > countElements)
 		throw("Invalid index");
@@ -288,47 +292,7 @@ line* list::operator[](const unsigned int index)
 	return &curr->val;
 }
 
-/*
-* Вывод списка в консоль
-*/
-void list::Print()
+point& listPositions::GetPoint()
 {
-	if (head != nullptr && head->prev)		// Если Голова списка не в изначальном положение
-		ResetList();
-
-	node* curr = head;
-	if (curr == nullptr)
-	{
-		std::cout << "There's no object in list to show" << '\n';
-	}
-	else
-	{
-		while (curr->next)
-		{
-			for (auto i = 0; i < 5; i++)
-			{
-				std::cout << curr->val.dots[i].GetX()
-					<< ' ' << curr->val.dots[i].GetY() << ' ';
-			}
-			std::cout << '\n';
-			curr = curr->next;
-		}
-		for (auto i = 0; i < 5; i++)
-		{
-			std::cout << curr->val.dots[i].GetX()
-				<< ' ' << curr->val.dots[i].GetY() << ' ';
-		}
-		std::cout << '\n';
-		curr = curr->next;
-	}
-}
-
-bool operator==(const line& arg_1, const line& arg_2)
-{
-	if (arg_1.dots[0] == arg_2.dots[0] &&
-		arg_1.dots[4] == arg_2.dots[4])
-	{
-		return true;
-	}
-	return false;
+	return head->val;
 }

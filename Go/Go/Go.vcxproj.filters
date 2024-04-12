@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Файлы заголовков\Structure">
+      <UniqueIdentifier>{7e8cb535-52e6-4806-bda9-74d85cf13c2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Structure">
+      <UniqueIdentifier>{ee41414b-9e72-4c33-a126-35ebcdf28627}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Go.cpp">
@@ -24,14 +30,17 @@
     <ClCompile Include="Map.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="List.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="Point.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="nTree.cpp">
-      <Filter>Исходные файлы</Filter>
+    <ClCompile Include="List.cpp">
+      <Filter>Исходные файлы\Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="ListPosition.cpp">
+      <Filter>Исходные файлы\Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="HistComb.cpp">
+      <Filter>Исходные файлы\Structure</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -41,17 +50,20 @@
     <ClInclude Include="Map.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="List.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="Point.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="DynamicArr.h">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="List.h">
+      <Filter>Файлы заголовков\Structure</Filter>
     </ClInclude>
-    <ClInclude Include="nTree.h">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="ListPositions.h">
+      <Filter>Файлы заголовков\Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="MinMaxNode.h">
+      <Filter>Файлы заголовков\Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="HistComb.h">
+      <Filter>Файлы заголовков\Structure</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

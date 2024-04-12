@@ -25,20 +25,6 @@ void nTree::NTreePass(nTreeNode* node, unsigned int depth,
 		NTreePass(node->sons.at(i), depth, t);
 }
 
-void nTree::Task(nTreeNode* node, unsigned int& maxHeight, unsigned int currHeight)
-{
-	if (node == nullptr)
-		return;
-
-	if (node->value % 2 != 0)
-	{
-		if (currHeight > maxHeight)
-			maxHeight = currHeight;
-		for (auto i = 0; i < node->sons.GetCountElements(); i++)
-			Task(node->sons.at(i), maxHeight, currHeight + 1);
-	}
-}
-
 void nTree::Clear(nTreeNode* node)
 {
 	if (node == nullptr)
@@ -49,56 +35,37 @@ void nTree::Clear(nTreeNode* node)
 	node->sons.Clear();
 }
 
-void nTree::PrintCurr(nTreeNode* node, unsigned int depth)
-{
-	if (node == nullptr)
-	{
-		if (depth == currHeight + 1)
-			std::cout << "Empty tree";
-		return;
-	}
-
-	/*if (depth == currHeight)
-		std::cout << "Current depth " << currHeight + 1 << '\n';*/
-	if (depth == currHeight + 1)
-		std::cout << node->value << ' ';
-	for (auto i = 0; i < node->sons.GetCountElements(); i++)
-	{
-		PrintCurr(node->sons.at(i), depth + 1);
-	}
-		
-}
-
 nTree::nTree()
 {
 	countElements = 0, height = 0, currHeight = 0;
 	root = nullptr, current = nullptr;
 }
 
-void nTree::Push(const int& val)
+void nTree::Push(const int& x, const int& y, const char& turn, 
+	listPositions& positionList)
 {
 	if (root == nullptr)
 	{
-		root = new nTreeNode(val);
+		root = new nTreeNode(minMaxNode(positionList,x,y,turn));
 		countElements++;
 		height = 1;
 		currHeight = 1;
 	}
 	else if (current == nullptr)
 	{
-		root->sons.Push(val);
+		root->sons.Push(minMaxNode(positionList, x, y, turn));
 		countElements++;
 		DefineHeight(root, 0);
 	}
 	else if (current->sons.GetCountElements())
 	{
-		current->sons.Push(val);
+		current->sons.Push(minMaxNode(positionList, x, y, turn));
 		countElements++;
 		DefineHeight(root, 0);
 	}
 	else
 	{
-		current->sons.Push(val);
+		current->sons.Push(minMaxNode(positionList, x, y, turn));
 		countElements++;
 		DefineHeight(root, 0);
 	}
@@ -170,23 +137,6 @@ void nTree::DeleteCurrHeight()
 	}
 }
 
-void nTree::PrintCurr()
-{
-	if (root == nullptr)
-		std::cout << "Your tree is empty";
-	else if (current == nullptr)
-	{
-		std::cout << "Current depth " << currHeight + 1 << '\n';
-		PrintCurr(root, 1);
-	}
-	else
-	{
-		std::cout << "Current depth " << currHeight + 1 << '\n';
-		PrintCurr(current, 2);
-	}
-	std::cout << '\n';
-}
-
 void nTree::ResetToRoot()
 {
 	if (root)
@@ -199,35 +149,59 @@ void nTree::ResetToRoot()
 	}
 }
 
+point& nTree::GetPosition()
+{
+	if (current)
+	{
+		return current->data.currentPos;
+	}
+	else if (root)
+	{
+		return root->data.currentPos;
+	}
+	else
+	{
+		throw("Empty tree");
+	}
+}
+
+char nTree::GetTurn()
+{
+	if (current)
+	{
+		return current->data.currTurn;
+	}
+	else if (root)
+	{
+		return root->data.currTurn;
+	}
+	else
+	{
+		throw("Empty tree");
+	}
+}
+
+listPositions& nTree::GetList()
+{
+	if (current)
+	{
+		return current->data.pos;
+	}
+	else if (root)
+	{
+		return root->data.pos;
+	}
+	else
+	{
+		throw("Empty tree");
+	}
+}
+
 void nTree::Clear()
 {
 	Clear(root);
 	root = nullptr, current = nullptr;
 	countElements = 0, height = 0, currHeight = 0;
-}
-
-void nTree::Print()
-{
-	if (root == nullptr)
-		std::cout << "Your tree is empty";
-	else
-	{
-		NTreePass(root, 0,[](nTreeNode* node, unsigned int maxHeight)
-			{
-				std::cout << node->value << ' ';
-			});
-	}
-	std::cout << '\n';
-}
-
-void nTree::Task()
-{
-	unsigned int maxDepth = 0;
-	if (root->value % 2 != 0)
-	{
-		Task(root, maxDepth, 1);
-	}
-	std::cout << "The maximum path along odd vertices is: " << maxDepth << '\n';
 }
 
 nTree::~nTree()

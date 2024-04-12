@@ -19,6 +19,9 @@ mono_crash.*
 # SFML
 SFML-2.6.0/
 
+#Test
+GameTest/
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

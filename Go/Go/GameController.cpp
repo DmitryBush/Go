@@ -4,7 +4,7 @@
 #include <conio.h>
 
 gameController::gameController(const unsigned int& x, const unsigned int& y):
-	width(x), height(y), gameMap(width, height), complete(false), opponentFirstMove(true)
+	width(x), height(y), gameMap(width, width), complete(false), opponentFirstMove(true)
 {
 	if (opponentFirstMove)
 	{
@@ -13,55 +13,271 @@ gameController::gameController(const unsigned int& x, const unsigned int& y):
 	}
 	else
 	{
-		aiStone = 'w';
-		playerStone = 'b';
+		aiStone = 'b';
+		playerStone = 'w';
 	}
 }
 
+gameController::~gameController()
+{}
+
+/*
+* Метод для определения хода (ИИ или игрока)
+*/
 void gameController::PlayerMove()
 {
-	while (true)
+	while (!complete)
 	{
 		system("cls");
 		TextModeOutput();
 
 		if (opponentFirstMove)
 		{
-			if (usedStone[0] == 12)
+			if (aiStone == 'b')
 			{
-				std::cout << "Ваш ход - черные фишки" << '\n'
-					<< "1. Передвинуть камень" << '\n';
+				int alpha = 1 << 31, beta = ~(1 << 31);
+				listPositions pos;
+				minMaxNode* root = nullptr;
+				point** matrix = nullptr;
+				try
+				{
+					root = new minMaxNode(nullptr, 0, 0, 'a');
+					matrix = new point * [width];
+					for (auto i = 0; i < width; i++)
+					{
+						matrix[i] = new point[width]{};
+					}
+				}
+				catch (const std::exception&)
+				{
+					throw("bad allocation");
+				}
 
-				PlayerMove(false);
+				if (usedStone[DefineIterator(true)] >= 12)
+				{
+					int score = MoveAlphaBeta(root, alpha, beta, matrix, 32);
+					std::cout << score << '\n';
+
+					/*for (auto i = 0; i < width; i++)
+					{
+						for (auto j = 0; j < width; j++)
+						{
+							std::cout << matrix[i][j].GetX() << ' ';
+						}
+						std::cout << '\n';
+					}
+					system("pause");*/
+					int* index = nullptr;
+					for (auto i = 0; i < width; i++)
+					{
+						for (auto j = 0; j < width; j++)
+						{
+							if (-1 == matrix[i][j].GetX() &&
+								score == matrix[i][j].GetY())
+							{
+								pos.PushForward(i, j);
+							}
+						}
+					}
+
+					if (pos.GetCountOfElements() > 0)
+					{
+						index = FindMoveBestPosition(pos);
+						aiMove(index);
+					}
+
+					if (index)
+						delete[] index;
+				}
+				else
+				{
+					int score = AlphaBeta(root, alpha, beta, matrix, 32);
+					int index = 0;
+					for (auto i = 0; i < width; i++)
+					{
+						for (auto j = 0; j < width; j++)
+						{
+							if (score == matrix[i][j].GetX())
+							{
+								pos.PushForward(i, j);
+							}
+						}
+					}
+
+					if (pos.GetCountOfElements() > 0)
+					{
+						index = FindBestPosition(pos);
+						aiMove(pos[index]->GetX(), pos[index]->GetY());
+					}
+					else
+					{
+						aiMove(0, 0);
+					}
+				}
+
+				for (auto i = 0; i < width; i++)
+				{
+					delete matrix[i];
+				}
+				delete[] matrix;
 			}
 			else
 			{
-				std::cout << "Ваш ход - черные фишки" << '\n'
-					<< "1. Поставить камень" << '\n';
+				if (usedStone[0] == 12)
+				{
+					std::cout << "Ваш ход - черные фишки" << '\n'
+						<< "1. Передвинуть камень" << '\n';
 
-				PlayerMove(true);
-				usedStone[0]++;
+					PlayerMove(false);
+				}
+				else
+				{
+					std::cout << "Ваш ход - черные фишки" << '\n'
+						<< "1. Поставить камень" << '\n';
+
+					PlayerMove(true);
+					usedStone[0]++;
+				}
 			}
 		}
 		else
 		{
-			if (usedStone[1] == 12)
+			if (aiStone == 'w')
 			{
-				std::cout << "Ваш ход - белые фишки" << '\n'
-					<< "1. Передвинуть камень" << '\n';
+				int alpha = 1 << 31, beta = ~(1 << 31);
+				listPositions pos;
+				minMaxNode* root = nullptr;
+				point** matrix = nullptr;
+				try
+				{
+					root = new minMaxNode(nullptr, 0, 0, 'a');
+					matrix = new point* [width];
+					for (auto i = 0; i < width; i++)
+					{
+						matrix[i] = new point[width] {};
+					}
+				}
+				catch (const std::exception&)
+				{
+					throw("bad allocation");
+				}
 
-				PlayerMove(false);
+				if (usedStone[DefineIterator(true)] >= 12)
+				{
+					int score = MoveAlphaBeta(root, alpha, beta, matrix, 32);
+					std::cout << score << '\n';
+
+				/*for (auto i = 0; i < width; i++)
+				{
+					for (auto j = 0; j < width; j++)
+					{
+						std::cout << matrix[i][j].GetX() << ' ';
+					}
+					std::cout << '\n';
+				}
+				system("pause");*/
+					int* index = nullptr;
+					for (auto i = 0; i < width; i++)
+					{
+						for (auto j = 0; j < width; j++)
+						{
+							if (-1 == matrix[i][j].GetX() &&
+								score == matrix[i][j].GetY())
+							{
+								pos.PushForward(i, j);
+							}
+						}
+					}
+
+					if (pos.GetCountOfElements() > 0)
+					{
+						index = FindMoveBestPosition(pos);
+						aiMove(index);
+					}
+					
+					if (index)
+						delete[] index;
+				}
+				else
+				{
+					int score = AlphaBeta(root, alpha, beta, 
+						matrix, 6);
+					int index = 0;
+					for (auto i = 0; i < width; i++)
+					{
+						for (auto j = 0; j < width; j++)
+						{
+							if (score == matrix[i][j].GetX())
+							{
+								pos.PushForward(i, j);
+							}
+						}
+					}
+
+					if (pos.GetCountOfElements() > 0)
+					{
+						index = FindBestPosition(pos);
+						aiMove(pos[index]->GetX(), pos[index]->GetY());
+					}
+					else
+					{
+						aiMove(0, 0);
+					}
+				}
+				
+				for (auto i = 0; i < width; i++)
+				{
+					delete matrix[i];
+				}
+				delete[] matrix;
 			}
 			else
 			{
-				std::cout << "Ваш ход - белые фишки" << '\n'
-					<< "1. Поставить камень" << '\n';
+				if (usedStone[1] == 12)
+				{
+					std::cout << "Ваш ход - белые фишки" << '\n'
+						<< "1. Передвинуть камень" << '\n';
 
-				PlayerMove(true);
-				usedStone[1]++;
+					PlayerMove(false);
+				}
+				else
+				{
+					std::cout << "Ваш ход - белые фишки" << '\n'
+						<< "1. Поставить камень" << '\n';
+
+					PlayerMove(true);
+					usedStone[1]++;
+				}
 			}
 		}	
 	}
+}
+
+/*
+* Метод для хода ИИ
+*/
+void gameController::aiMove(const int& x, const int& y)
+{
+	gameMap.SetStone(x, y, DefineMove());
+	Update();
+
+	usedStone[DefineIterator(true)]++;
+	opponentFirstMove = !opponentFirstMove;
+}
+
+/*
+* Метод для хода ИИ
+*/
+void gameController::aiMove(int* prevCoord)
+{
+	/*for (auto i = 0; i < 4; i++)
+	{
+		std::cout << prevCoord[i] << ' ';
+	}
+	system("pause");*/
+	gameMap.MoveStone(prevCoord[0], prevCoord[1], prevCoord[2], prevCoord[3]);
+	Update();
+	opponentFirstMove = !opponentFirstMove;
 }
 
 void gameController::PlayerMove(const bool setStone)
@@ -76,14 +292,14 @@ void gameController::PlayerMove(const bool setStone)
 		gameMap.SetStone(x - 1, y - 1, DefineMove());
 		Update();
 
-		DebugOutputMoveAnalyzer();
 		opponentFirstMove = !opponentFirstMove;
 	}
 	else
 	{
 		std::cout << "Введите предыдущюю строку и столбец" << '\n';
 		std::cin >> prevX_coord >> prevY_coord;
-		CheckInputValidation(prevX_coord, prevY_coord);
+		CheckInputValidation(prevX_coord, prevY_coord, 
+			"Введите предыдущюю строку и столбец");
 
 		system("cls");
 		TextModeOutput();
@@ -94,169 +310,186 @@ void gameController::PlayerMove(const bool setStone)
 		gameMap.MoveStone(prevX_coord - 1, prevY_coord - 1, x - 1, y - 1);
 		Update();
 
-		DebugOutputMoveAnalyzer();
 		opponentFirstMove = !opponentFirstMove;
 	}
 }
 
 int gameController::Update()
 {
-	for (int i = 0; i < width; i++) // по строке
+	// Проверка по горизонтали
+	for (int i = 0; i < width; ++i)
 	{
-		int lenRow = 0; point beg, end;
-		bool begOfSeries = true;
-		for (int j = 0; j < height; j++)
+		line dots;
+		for (int j = 0; j < width - 4; ++j)
 		{
-			if (gameMap.GetCell(i, j) == DefineMove())
+			bool sequence = true;
+			for (int k = 0; k < 5; ++k)
 			{
-				if (begOfSeries)
+				if (gameMap.GetCell(i,j + k) != DefineMove())
 				{
-					beg.SetPoint(i, j);
-					begOfSeries = false;
+					sequence = false;
+					break;
 				}
-				lenRow++;
-				end.SetPoint(i, j);
-			}	
-			else
-			{
-				lenRow = 0; begOfSeries = true;
-				beg.SetPoint(0, 0); end.SetPoint(0, 0);
-			}	
-		}
+				dots.dots[k].SetPoint(i, j + k);
+			}
 
-		if (lenRow == 5)
-		{
-			if (opponentFirstMove && !FindHistoryComb(beg, end))
+			if (opponentFirstMove && sequence &&
+				!FindHistoryComb(dots, horizontal))
 			{
-				playersScore[0]++; playersHistComb[0].PushForward(beg, end);
-			}	
-			else if (!FindHistoryComb(beg, end))
+				playersScore[0]++;
+				playersHistComb[0].GetList(horizontal).PushForward(dots);
+			}
+			else if (sequence && !FindHistoryComb(dots, horizontal))
 			{
-				playersScore[1]++; playersHistComb[1].PushForward(beg, end);
-			}	
+				playersScore[1]++;
+				playersHistComb[1].GetList(horizontal).PushForward(dots);
+			}
 		}
 	}
-
-	for (int j = 0; j < width; j++) // По столбцу
+	
+	// Проверка по вертикали
+	for (int i = 0; i < width - 4; ++i)
 	{
-		int lenColumn = 0; point beg, end;
-		bool begOfSeries = true;
-		for (int i = 0; i < height; i++)
+		line dots;
+		for (int j = 0; j < width; ++j)
 		{
-			if (gameMap.GetCell(i, j) == DefineMove())
+			bool sequence = true;
+
+			for (int k = 0; k < 5; ++k)
 			{
-				if (begOfSeries)
+				if (gameMap.GetCell(i + k, j) != DefineMove())
 				{
-					beg.SetPoint(i, j);
-					begOfSeries = false;
+					sequence = false;
+					break;
 				}
-				lenColumn++;
-				end.SetPoint(i, j);
+				dots.dots[k].SetPoint(i + k, j);
 			}
-			else
-			{
-				begOfSeries = true; lenColumn = 0;
-				beg.SetPoint(0, 0); end.SetPoint(0, 0);
-			}
-				
-		}
 
-		if (lenColumn == 5)
-		{
-			if (opponentFirstMove && !FindHistoryComb(beg, end))
+			if (opponentFirstMove && sequence &&
+				!FindHistoryComb(dots, vertical))
 			{
-				playersScore[0]++; playersHistComb[0].PushForward(beg, end);
+				playersScore[0]++;
+				playersHistComb[0].GetList(vertical).PushForward(dots);
 			}
-			else if (!FindHistoryComb(beg, end))
+			else if (sequence && !FindHistoryComb(dots, vertical))
 			{
-				playersScore[1]++; playersHistComb[1].PushForward(beg, end);
+				playersScore[1]++;
+				playersHistComb[1].GetList(vertical).PushForward(dots);
 			}
 		}
 	}
 
-	for (int i = 0, lenDiagonal = 0; i < width; i++) // Главная диагональ
+	// Проверка по диагонали (слева направо)
+	for (int i = 0; i < width - 4; ++i)
 	{
-		point beg, end;
-		bool begOfSeries = true;
-		if (gameMap.GetCell(i, i) == DefineMove())
+		line dots;
+		for (int j = 0; j < width - 4; ++j)
 		{
-			if (begOfSeries)
+			bool sequence = true;
+			for (int k = 0; k < 5; ++k)
 			{
-				beg.SetPoint(i, i);
-				begOfSeries = false;
+				if (gameMap.GetCell(i + k, j + k) != DefineMove())
+				{
+					sequence = false;
+					break;
+				}
+				dots.dots[k].SetPoint(i + k, j + k);
 			}
-			lenDiagonal++;
-			end.SetPoint(i, i);
-		}
-		else
-		{
-			lenDiagonal = 0; begOfSeries = true;
-			beg.SetPoint(0, 0); end.SetPoint(0, 0);
-		}
 
-		if (lenDiagonal == 5)
-		{
-			if (opponentFirstMove && !FindHistoryComb(beg, end))
+			if (opponentFirstMove && sequence &&
+				!FindHistoryComb(dots, mainDiagonal))
 			{
-				playersScore[0]++; playersHistComb[0].PushForward(beg, end);
+				playersScore[0]++;
+				playersHistComb[0].GetList(mainDiagonal).PushForward(dots);
 			}
-			else if (!FindHistoryComb(beg, end))
+			else if (sequence && !FindHistoryComb(dots, mainDiagonal))
 			{
-				playersScore[1]++; playersHistComb[1].PushForward(beg, end);
+				playersScore[1]++;
+				playersHistComb[1].GetList(mainDiagonal).PushForward(dots);
 			}
 		}
 	}
 
-	for (int i = width - 1, lenSideDiagonal = 0; i >= 0; i--) // Побочная диагональ
-	{
-		point beg, end;
-		bool begOfSeries = true;
-		if (gameMap.GetCell(i, (width - 1) - i) == DefineMove())
-		{
-			if (begOfSeries)
+	// Проверка по диагонали (справа налево)
+    for (int i = 4; i < width; ++i)
+    {
+        line dots;
+        for (int j = 0; j < width - 4; ++j)
+        {
+            bool sequence = true;
+            for (int k = 0; k < 5; ++k) 
+            {
+                if (gameMap.GetCell(i - k, j + k) != DefineMove())
+                {
+                    sequence = false;
+                    break;
+                }
+                dots.dots[k].SetPoint(i - k, j + k);
+            }
+            
+			if (opponentFirstMove && sequence &&
+				!FindHistoryComb(dots, sideDiagonal))
 			{
-				beg.SetPoint(i, (width - 1) - i);
-				begOfSeries = false;
+				playersScore[0]++;
+				playersHistComb[0].GetList(sideDiagonal).PushForward(dots);
 			}
-			lenSideDiagonal++;
-			end.SetPoint(i, (width - 1) - i);
-		}
-		else
-		{
-			lenSideDiagonal = 0; begOfSeries = true;
-			beg.SetPoint(0, 0); end.SetPoint(0, 0);
-		}
+			else if (sequence && !FindHistoryComb(dots, sideDiagonal))
+			{
+				playersScore[1]++;
+				playersHistComb[1].GetList(sideDiagonal).PushForward(dots);
+			}
+        }
+    }
 
-		if (lenSideDiagonal == 5)
-		{
-			if (opponentFirstMove && !FindHistoryComb(beg, end))
-			{
-				playersScore[0]++; playersHistComb[0].PushForward(beg, end);
-			}
-			else if (!FindHistoryComb(beg, end))
-			{
-				playersScore[1]++; playersHistComb[1].PushForward(beg, end);
-			}
-		}
-	}
-
-	for (int i = 0; i < 2; i++)
-		if (playersScore[i] == 10)
-			complete = true;
+	complete = completeCheck();
 	return 0;
 }
 
-bool gameController::FindHistoryComb(const point& beg, const point& end)
+bool gameController::completeCheck()
+{
+	for (int i = 0; i < 2; i++)
+		if (playersScore[i] >= 10)
+			return true;
+	return false;
+}
+
+bool gameController::FindHistoryComb(const line& comb, ListOrient orient)
 {
 	if (opponentFirstMove)
-		for (int i = 0; i < playersHistComb[0].GetCountOfElements(); i++)
-			if (playersHistComb[0][i][0] == beg && playersHistComb[0][i][1] == end)
-				return true;
+	{
+		for (int i = 0; i < playersHistComb[0].GetList(orient).GetCountOfElements(); i++)
+			for (auto j = 0; j < 5; j++)
+				if (*playersHistComb[0].GetList(orient)[i] == comb)
+					return true;
+	}
 	else
-		for (int i = 0; i < playersHistComb[1].GetCountOfElements(); i++)
-			if (playersHistComb[1][i][0] == beg && playersHistComb[1][i][1] == end)
+	{
+		for (int i = 0; i < playersHistComb[1].GetList(orient).GetCountOfElements(); i++)
+			for (auto j = 0; j < 5; j++)
+				if (*playersHistComb[1].GetList(orient)[i] == comb)
+					return true;
+	}
+	return false;
+}
+
+bool gameController::FindHistoryComb(const line& comb, 
+	ListOrient orient, const unsigned int iter)
+{
+	for (int i = 0; i < playersHistComb[iter].GetList(orient).GetCountOfElements(); i++)
+		for (auto j = 0; j < 5; j++)
+			if (*playersHistComb[iter].GetList(orient)[i] == comb)
 				return true;
 	return false;
+}
+
+void gameController::GetResults()
+{
+	system("cls");
+	TextModeOutput();
+	if (playersScore[DefineIterator(true)] == 10)
+		std::cout << "Победил ИИ" << '\n';
+	else if(playersScore[DefineIterator(false)] == 10)
+		std::cout << "Победил игрок" << '\n';
 }
 
 char gameController::DefineMove()
@@ -283,7 +516,7 @@ void gameController::TextModeOutput()
 {
 	std::cout << "Очки " << playersScore[0] << " - Черные фишки, "
 		<< playersScore[1] << " - белые фишки\n";
-	playersHistComb[0].Print();
+	
 	std::cout << "  ";
 	for (int i = 1; i <= height; i++)
 	{
@@ -299,8 +532,15 @@ void gameController::TextModeOutput()
 		{
 			std::cout << gameMap.GetCell(i,j) << ' ';
 		}
-		std::cout << '\n';
+		std::cout << i + 1 << '\n';
 	}
+
+	std::cout << "  ";
+	for (int i = 1; i <= height; i++)
+	{
+		std::cout << i << ' ';
+	}
+	std::cout << '\n';
 }
 
 void gameController::CheckInputValidation(int& x, int& y)
@@ -319,32 +559,107 @@ void gameController::CheckInputValidation(int& x, int& y)
 	}
 }
 
-void gameController::CheckInputValidation(int& prevX_coord, int& prevY_coord,
-	int& x_coord, int& y_coord)
+void gameController::CheckInputValidation(int& x, int& y, std::string suggestion)
 {
-	while (std::cin.fail() 
-		|| gameMap.GetCell(prevX_coord - 1, prevY_coord - 1) != DefineMove()
-		|| !gameMap.EmptyCheck(x_coord - 1, y_coord - 1))
+	while (std::cin.fail() || !gameMap.GetCell(x - 1, y - 1))
 	{
 		system("cls");
 		std::cin.clear();
 		std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
-		if (gameMap.GetCell(prevX_coord - 1, prevY_coord - 1) != DefineMove())
+		TextModeOutput();
+		std::cout << "An error has occuried" << '\n'
+			<< suggestion << '\n';
+		std::cin >> x >> y;
+	}
+}
+
+listPositions gameController::FindMovePos(const unsigned int& prevX, 
+	const unsigned int& prevY)
+{
+	listPositions pos;
+
+	for (auto i = -1; i < 2; i++)
+	{
+		if (gameMap.EmptyCheck(prevX + i, prevY))
+			pos.PushForward(prevX + i, prevY);
+		if (gameMap.EmptyCheck(prevX, prevY + i))
+			pos.PushForward(prevX, prevY + i);
+		if (gameMap.EmptyCheck(prevX + i, prevY + i))
+			pos.PushForward(prevX + i, prevY + i);
+		if (gameMap.EmptyCheck(prevX - i, prevY - i))
+			pos.PushForward(prevX - i, prevY - i);
+	}
+	return pos;
+}
+
+bool gameController::CheckCorrectMove(const int& prevX, const int& prevY,
+	const int& x, const int& y)
+{
+	for (int i = -1; i < 2; i++)
+	{
+		if (gameMap.EmptyCheck(prevX + i, prevY) && prevX + i == x
+			&& prevY == y)
+			return true;
+		if (gameMap.EmptyCheck(prevX, prevY + i) && prevX == x
+			&& prevY + i == y)
+			return true;
+		if (gameMap.EmptyCheck(prevX + i, prevY + i) && prevX + i == x
+			&& prevY + i == y)
+			return true;
+		if (gameMap.EmptyCheck(prevX - i, prevY - i) && prevX - i == x
+			&& prevY - i == y)
+			return true;
+	}
+	return false;
+}
+
+void gameController::CheckInputValidation(int& prevX, int& prevY,
+	int& x, int& y)
+{
+	bool noValid = false;
+	while (std::cin.fail()
+		|| !gameMap.EmptyCheck(x - 1, y - 1)
+		|| (noValid = //!CheckCorrectMove(prevX, prevY, x, y) || 
+			gameMap.GetCell(prevX - 1, prevY - 1) != DefineMove()))
+	{
+		system("cls");
+		std::cin.clear();
+		std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
+		TextModeOutput();
+		if (noValid)
+		{
+			std::cout << "An error has occuried" << '\n'
+				<< "Введите заново предыдущую строку и столбец элемента" << '\n';
+			std::cin >> prevX >> prevY;
+		}
+		std::cout << "An error has occuried" << '\n'
+			<< "Введите заново строку и столбец" << '\n';
+		std::cin >> x >> y;
+	}
+
+	/*while (std::cin.fail() 
+		|| gameMap.GetCell(prevX - 1, prevY - 1) != DefineMove()
+		|| !gameMap.EmptyCheck(x - 1, y - 1))
+	{
+		system("cls");
+		std::cin.clear();
+		std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
+		if (gameMap.GetCell(prevX - 1, prevY - 1) != DefineMove())
 		{
 			TextModeOutput();
 			std::cout << "An error has occuried" << '\n'
 				<< "Введите заново предыдущую строку и столбец элемента" << '\n';
-			std::cin >> prevX_coord >> prevY_coord;
+			std::cin >> prevX >> prevY;
 		}
 
-		if (!gameMap.EmptyCheck(x_coord - 1, y_coord - 1))
+		if (!gameMap.EmptyCheck(x - 1, y - 1))
 		{
 			TextModeOutput();
 			std::cout << "An error has occuried" << '\n'
 				<< "Введите заново строку и столбец в перемещяемый элемент" << '\n';
-			std::cin >> x_coord >> y_coord;
+			std::cin >> x >> y;
 		}
-	}
+	}*/
 }
 
 /*
@@ -358,7 +673,7 @@ int gameController::CheckPattern(const std::string& position,
 		int patternEval = 0;
 		// посследовательность из пяти
 		if (position.find("bbbbb") != std::string::npos)
-			patternEval += 100000000;
+			patternEval += 20000000;
 		// Ударная четыре
 		if (position.find("bbbbw") != std::string::npos
 			|| position.find("wbbbb") != std::string::npos
@@ -368,7 +683,7 @@ int gameController::CheckPattern(const std::string& position,
 			patternEval += 1000000;
 		// Живая четверка
 		if (position.find("0bbbb0") != std::string::npos)
-			patternEval += 10000000;
+			patternEval += 2000000;
 		// Спящая тройка
 		if (position.find("bbbw") != std::string::npos
 			|| position.find("wbbb") != std::string::npos 
@@ -384,12 +699,12 @@ int gameController::CheckPattern(const std::string& position,
 			|| position.find("b0b0b") != std::string::npos
 			|| position.find("b0bb") != std::string::npos
 			|| position.find("bb0b") != std::string::npos)
-			patternEval += 10000;
+			patternEval += 100000;
 		// живая тройка
 		if (position.find("0bbb0") != std::string::npos
 			|| position.find("0b0bb0") != std::string::npos
 			|| position.find("0bb0b0") != std::string::npos)
-			patternEval += 100000;
+			patternEval += 200000;
 		// спящая двойка
 		if (position.find("bbw") != std::string::npos
 			|| position.find("wbb") != std::string::npos
@@ -401,17 +716,17 @@ int gameController::CheckPattern(const std::string& position,
 			|| position.find("wb0b00") != std::string::npos
 			|| position.find("wb00b0") != std::string::npos
 			|| position.find("w00bb0w") != std::string::npos)
-			patternEval += 100;
+			patternEval += 10000;
 		// живая двойка
 		if (position.find("0bb0") != std::string::npos
 			|| position.find("0b00b0") != std::string::npos
 			|| position.find("0b0b0") != std::string::npos)
-			patternEval += 1000;
+			patternEval += 20000;
 		// один камень
 		if (position.find("b") != std::string::npos)						
-			patternEval += 10;
+			patternEval += 1000;
 		if (DefineZeroStr(position)) // нет элементов
-			patternEval += 1;
+			patternEval += 200;
 		if (aiStone == currStone)
 		{
 			return patternEval;
@@ -423,7 +738,7 @@ int gameController::CheckPattern(const std::string& position,
 		int patternEval = 0;
 		// посследовательность из пяти
 		if (position.find("wwwww") != std::string::npos)
-			patternEval += 100000000;
+			patternEval += 20000000;
 		// Ударная четыре
 		if (position.find("wwwwb") != std::string::npos
 			|| position.find("bwwww") != std::string::npos
@@ -433,7 +748,7 @@ int gameController::CheckPattern(const std::string& position,
 			patternEval += 1000000;
 		// Живая четверка
 		if (position.find("0wwww0") != std::string::npos)
-			patternEval += 10000000;
+			patternEval += 2000000;
 		// Спящая тройка
 		if (position.find("wwwb") != std::string::npos
 			|| position.find("bwww") != std::string::npos
@@ -449,12 +764,12 @@ int gameController::CheckPattern(const std::string& position,
 			|| position.find("w0w0w") != std::string::npos
 			|| position.find("w0ww") != std::string::npos
 			|| position.find("ww0w") != std::string::npos)
-			patternEval += 10000;
+			patternEval += 100000;
 		// живая тройка
 		if (position.find("0www0") != std::string::npos
 			|| position.find("0w0ww0") != std::string::npos
 			|| position.find("0ww0w0") != std::string::npos)
-			patternEval += 100000;
+			patternEval += 200000;
 		// спящая двойка
 		if (position.find("wwb") != std::string::npos
 			|| position.find("bww") != std::string::npos
@@ -466,17 +781,17 @@ int gameController::CheckPattern(const std::string& position,
 			|| position.find("bw0w00") != std::string::npos
 			|| position.find("bw00w0") != std::string::npos
 			|| position.find("b00ww0b") != std::string::npos)
-			patternEval += 100;
+			patternEval += 10000;
 		// живая двойка
 		if (position.find("0ww0") != std::string::npos 
 			|| position.find("0w00w0") != std::string::npos
 			|| position.find("0w0w0") != std::string::npos)
-			patternEval += 1000;
+			patternEval += 20000;
 		// один камень
 		if (position.find("w") != std::string::npos)
-			patternEval += 10;
+			patternEval += 1000;
 		if (DefineZeroStr(position))	// нет элементов
-			patternEval += 1;
+			patternEval += 200;
 		if (aiStone == currStone)
 		{
 			return patternEval;
@@ -540,6 +855,21 @@ int gameController::Evaluation(const unsigned int x,
 	return evaluation;
 }
 
+/*
+* Метод проверяющий поле
+*/
+int gameController::EvaluateField()
+{
+	int eval = 0;
+	for (auto i = 0; i < width; i++)
+	{
+		for (auto j = 0; j < width; j++)
+		{
+			eval += Evaluation(i, j);
+		}
+	}
+	return eval;
+}
 
 void gameController::DebugOutputMoveAnalyzer()
 {
@@ -561,4 +891,887 @@ bool gameController::DefineZeroStr(const std::string& string)
 		if (string[i] != '0')
 			return false;
 	return true;
+}
+
+/*
+* Метод находящий одинаковые позиции
+*/
+bool gameController::FindPrevPos(const minMaxNode* node) const
+{
+	if (node)
+	{
+		if (node->prev)
+		{
+			minMaxNode* curr = node->prev;
+			while (curr->prev)
+			{
+				if (node->currentPos == curr->currentPos && 
+					node->currTurn == curr->currTurn)
+					return true;
+				curr = curr->prev;
+			}
+
+			if (node->currentPos == curr->currentPos &&
+				node->currTurn == curr->currTurn)
+				return true;
+		}
+	}
+	return false;
+}
+
+/*
+* Метод отвечающий за стратегию минимакс
+*/
+int gameController::AlphaBeta(minMaxNode* node, int& alpha, int& beta
+	, point** matrix, const unsigned int depth)
+{
+	int evaluation = 0;
+	
+	// Условие победы в игре ГО-БАН
+	if (completeCheck() && node->currTurn == 'a')
+		return ~(1 << 31);
+	else if (completeCheck())
+		return 1 << 31;
+
+	if (depth == 0)
+		return EvaluateField();
+
+	// Выполняется, если ИИ зашел на клетку более одного раза
+	if (FindPrevPos(node))
+		return EvaluateField();
+	
+	// Текущий ход - ИИ
+	if (node->currTurn == 'a')
+	{
+		evaluation = 1 << 31;
+		for (auto i = 0; i < width; i++)
+		{
+			for (auto j = 0; j < width; j++)
+			{
+				if (gameMap.EmptyCheck(i, j))	// Минимакс для первого этапа игры
+				{
+					// Выделение памяти и постановка фишки
+					gameMap.SetStone(i, j, aiStone);
+					minMaxNode* nextNode = nullptr;
+					try
+					{
+						nextNode = new minMaxNode(node, i, j, 'p');
+					}
+					catch (const std::exception&)
+					{
+						throw("bad allocation");
+					}
+					usedStone[DefineIterator(true)]++;
+					int* stonePerIter = MinMaxUpdate(nextNode);
+
+					// расчет последующих позиций
+					evaluation = std::max(evaluation, 
+						AlphaBeta(nextNode, alpha, beta, matrix, depth - 1));
+
+					// Отмена постановки фишки и освобождение ресурсов
+					if (stonePerIter[4] > 0)
+					{
+						for (auto s = 0; s < stonePerIter[horizontal]; s++)
+						{
+							playersHistComb[DefineIterator(true)]
+								.GetList(horizontal).PopForward();
+						}
+
+						for (auto s = 0; s < stonePerIter[vertical]; s++)
+						{
+							playersHistComb[DefineIterator(true)]
+								.GetList(vertical).PopForward();
+						}
+
+						for (auto s = 0; s < stonePerIter[mainDiagonal]; s++)
+						{
+							playersHistComb[DefineIterator(true)]
+								.GetList(mainDiagonal).PopForward();
+						}
+
+						for (auto s = 0; s < stonePerIter[sideDiagonal]; s++)
+						{
+							playersHistComb[DefineIterator(true)]
+								.GetList(sideDiagonal).PopForward();
+						}
+						playersScore[DefineIterator(true)] -= stonePerIter[4];
+					}
+					gameMap.SetStone(i, j, '0');
+					usedStone[DefineIterator(true)]--;
+					try
+					{
+						delete[] stonePerIter;
+						delete nextNode;
+					}
+					catch (const std::exception&)
+					{
+						throw("bad allocation");
+					}
+
+					if (evaluation > alpha) 
+					{
+						alpha = evaluation;
+						matrix[i][j].SetPoint(alpha, 0);
+					}
+				}
+				if (alpha >= beta)
+				{
+					break;
+				}
+			}
+			if (alpha >= beta) 
+			{
+				break;
+			}
+		}
+		return alpha;
+	}
+	else
+	{
+		evaluation = ~(1 << 31);
+		for (auto i = 0; i < width; i++)
+		{
+			for (auto j = 0; j < width; j++)
+			{
+				if (gameMap.EmptyCheck(i, j))	// Минимакс для первого этапа игры
+				{
+					// Выделение памяти и постановка фишки
+					gameMap.SetStone(i, j, playerStone);
+					minMaxNode* nextNode = nullptr;
+					try
+					{
+						nextNode = new minMaxNode(node, i, j, 'a');
+					}
+					catch (const std::exception&)
+					{
+						throw("bad deallocation");
+					}
+					usedStone[DefineIterator(false)]++;
+					int* stonePerIter = MinMaxUpdate(nextNode);
+
+					// расчет последующих позиций
+					evaluation = std::min(
+						AlphaBeta(nextNode, alpha, beta, matrix, depth - 1),
+						evaluation);
+
+					// Отмена постановки фишки и освобождение ресурсов
+					if (stonePerIter[4])
+					{
+						for (auto s = 0; s < stonePerIter[horizontal]; s++)
+						{
+							playersHistComb[DefineIterator(false)]
+								.GetList(horizontal).PopForward();
+						}
+
+						for (auto s = 0; s < stonePerIter[vertical]; s++)
+						{
+							playersHistComb[DefineIterator(false)]
+								.GetList(vertical).PopForward();
+						}
+
+						for (auto s = 0; s < stonePerIter[mainDiagonal]; s++)
+						{
+							playersHistComb[DefineIterator(false)]
+								.GetList(mainDiagonal).PopForward();
+						}
+
+						for (auto s = 0; s < stonePerIter[sideDiagonal]; s++)
+						{
+							playersHistComb[DefineIterator(false)]
+								.GetList(sideDiagonal).PopForward();
+						}
+						playersScore[DefineIterator(false)] -= stonePerIter[4];
+					}
+					gameMap.SetStone(i, j, '0');
+					usedStone[DefineIterator(false)]--;
+					try
+					{
+						delete[] stonePerIter;
+						delete nextNode;
+					}
+					catch (const std::exception&)
+					{
+						throw("bad deallocation");
+					}
+
+					if (evaluation < beta)
+					{
+						beta = evaluation;
+						matrix[i][j].SetPoint(beta, 0);
+					}
+				}
+				if (alpha >= beta)
+				{
+					break;
+				}
+			}
+			if (alpha >= beta) {
+				break;
+			}
+		}
+		return beta;
+	}
+}
+
+int gameController::MoveAlphaBeta(minMaxNode* node, int& alpha, int& beta,
+	point** matrix, const unsigned int depth)
+{
+	int evaluation = 0;
+
+	// Условие победы в игре ГО-БАН
+	if (completeCheck() && node->currTurn == 'a')
+		return ~(1 << 31);
+	else if (completeCheck())
+		return 1 << 31;
+
+	if (depth == 0)
+		return EvaluateField();
+
+	// Выполняется, если ИИ зашел на клетку более одного раза
+	/*if (FindPrevPos(node))
+		return EvaluateField();*/
+
+	if (node->currTurn == 'a')
+	{
+		evaluation = 1 << 31;
+		for (auto i = 0; i < width; i++)
+		{
+			for (auto j = 0; j < width; j++)
+			{
+				if(gameMap.EmptyCheck(i, j))
+				{
+					listPositions newPos;
+					MoveStagePositions(node, newPos, i, j);
+					for (auto k = 0; k < newPos.GetCountOfElements(); k++)
+					{
+						gameMap.MoveStone(newPos[k]->GetX(), newPos[k]->GetY(),
+							i, j);
+						minMaxNode* nextNode = nullptr;
+						try
+						{
+							nextNode = new minMaxNode(node, i, j, 
+								newPos[k]->GetX(), newPos[k]->GetY(), 'p');
+						}
+						catch (const std::exception&)
+						{
+							throw("bad allocation");
+						}
+						int* stonePerIter = MinMaxUpdate(nextNode);
+
+						// расчет последующих позиций
+						evaluation = std::max(evaluation,
+							MoveAlphaBeta(nextNode, alpha, beta, matrix, depth - 1));
+
+						// Отмена постановки фишки и освобождение ресурсов
+						if (stonePerIter[4] > 0)
+						{
+							for (auto s = 0; s < stonePerIter[horizontal]; s++)
+							{
+								playersHistComb[DefineIterator(true)]
+									.GetList(horizontal).PopForward();
+							}
+
+							for (auto s = 0; s < stonePerIter[vertical]; s++)
+							{
+								playersHistComb[DefineIterator(true)]
+									.GetList(vertical).PopForward();
+							}
+
+							for (auto s = 0; s < stonePerIter[mainDiagonal]; s++)
+							{
+								playersHistComb[DefineIterator(true)]
+									.GetList(mainDiagonal).PopForward();
+							}
+
+							for (auto s = 0; s < stonePerIter[sideDiagonal]; s++)
+							{
+								playersHistComb[DefineIterator(true)]
+									.GetList(sideDiagonal).PopForward();
+							}
+							playersScore[DefineIterator(true)] -= stonePerIter[4];
+						}
+						gameMap.MoveStone(i, j,
+							newPos[k]->GetX(), newPos[k]->GetY());
+						try
+						{
+							delete[] stonePerIter;
+							delete nextNode;
+						}
+						catch (const std::exception&)
+						{
+							throw("bad allocation");
+						}
+
+						if (evaluation > alpha)
+						{
+							alpha = evaluation;
+							//matrix[i][j] = alpha;
+							/*matrix[newPos[k]->GetX()][newPos[k]->GetY()]
+								.SetPoint(alpha, 0);*/
+							/*if (copyGameMap.EmptyCheck(i, j))
+							{
+								matrix[i][j]
+									.SetPoint(-1, alpha);
+							}*/
+							OriginSearch(node, matrix, evaluation);
+						}
+
+						/*if (alpha >= beta)
+						{
+							break;
+						}*/
+					}
+				}
+				if (alpha >= beta)
+				{
+					break;
+				}
+			}
+			if (alpha >= beta)
+			{
+				break;
+			}
+		}
+		return alpha;
+	}
+	else
+	{
+		evaluation = ~(1 << 31);
+		for (auto i = 0; i < width; i++)
+		{
+			for (auto j = 0; j < width; j++)
+			{
+				if (gameMap.EmptyCheck(i, j))
+				{
+					listPositions newPos; //int tmpEval = beta;
+					MoveStagePositions(node, newPos, i, j);
+					for (unsigned int k = 0; k < newPos.GetCountOfElements(); k++)
+					{
+						gameMap.MoveStone(newPos[k]->GetX(), newPos[k]->GetY(),
+							i, j);
+						//TextModeOutput();
+						minMaxNode* nextNode = nullptr;
+						try
+						{
+							nextNode = new minMaxNode(node, i, j, 
+								newPos[k]->GetX(), newPos[k]->GetY(), 'a');
+						}
+						catch (const std::exception&)
+						{
+							throw("bad allocation");
+						}
+						int* stonePerIter = MinMaxUpdate(nextNode);
+
+						// расчет последующих позиций
+						evaluation = std::min(evaluation,
+							MoveAlphaBeta(nextNode, alpha, beta, matrix, depth - 1));
+
+						// Отмена постановки фишки и освобождение ресурсов
+						if (stonePerIter[4] > 0)
+						{
+							for (auto s = 0; s < stonePerIter[horizontal]; s++)
+							{
+								playersHistComb[DefineIterator(false)]
+									.GetList(horizontal).PopForward();
+							}
+
+							for (auto s = 0; s < stonePerIter[vertical]; s++)
+							{
+								playersHistComb[DefineIterator(false)]
+									.GetList(vertical).PopForward();
+							}
+
+							for (auto s = 0; s < stonePerIter[mainDiagonal]; s++)
+							{
+								playersHistComb[DefineIterator(false)]
+									.GetList(mainDiagonal).PopForward();
+							}
+
+							for (auto s = 0; s < stonePerIter[sideDiagonal]; s++)
+							{
+								playersHistComb[DefineIterator(false)]
+									.GetList(sideDiagonal).PopForward();
+							}
+							playersScore[DefineIterator(false)] -= stonePerIter[4];
+						}
+						gameMap.MoveStone(i, j,
+							newPos[k]->GetX(), newPos[k]->GetY());
+						try
+						{
+							delete[] stonePerIter;
+							delete nextNode;
+						}
+						catch (const std::exception&)
+						{
+							throw("bad allocation");
+						}
+
+						if (evaluation < beta)
+						{
+							beta = evaluation;
+							/*matrix[newPos[k]->GetX()][newPos[k]->GetY()]
+								.SetPoint(beta, 0);*/
+							/*matrix[i][j]
+								.SetPoint(beta, 0);*/
+							OriginSearch(node, matrix, evaluation);
+						}
+
+						/*if (alpha >= beta)
+						{
+							break;
+						}*/
+					}
+				}
+				if (alpha >= beta)
+				{
+					break;
+				}
+			}
+			if (alpha >= beta)
+			{
+				break;
+			}
+		}
+		return beta;
+	}
+}
+
+void gameController::OriginSearch(minMaxNode* node, point** matrix, int val)
+{
+	if (node)
+	{
+		if (node->prev)
+		{
+			if (!node->prev->prev)
+			{
+				matrix[node->currentPos.GetX()][node->currentPos.GetY()]
+					.SetPoint(-1, val);
+				matrix[node->oldPos.GetX()][node->oldPos.GetY()].
+					SetPoint(val, 0);
+			}
+			else if (node->prev->prev)
+			{
+				minMaxNode* curr = node->prev;
+				while (curr->prev)
+				{
+					if (!curr->prev->prev)
+					{
+						matrix[curr->currentPos.GetX()][curr->currentPos.GetY()]
+							.SetPoint(-1, val);
+						matrix[curr->oldPos.GetX()][curr->oldPos.GetY()].
+							SetPoint(val, 0);
+					}
+					curr = curr->prev;
+				}
+			}
+		}
+	}
+}
+
+/*
+* Метод для поиска камней вокруг пустой ячейки 2 этапа игры
+*/
+void gameController::MoveStagePositions(minMaxNode* node, listPositions& pos,
+	const int& emptX, const int& emptY)
+{
+	// Цикл поиска камня для перемещения в пустую ячейку
+	for (auto k = -1; k < 2; k++)
+	{
+		if (gameMap.GetCell(emptX + k, emptY) == DefineMove(node))
+			pos.PushForward(emptX + k, emptY);
+
+		if (gameMap.GetCell(emptX, emptY + k) == DefineMove(node))
+			pos.PushForward(emptX, emptY + k);
+
+		if (gameMap.GetCell(emptX + k, emptY + k) == DefineMove(node))
+			pos.PushForward(emptX + k, emptY + k);
+
+		if (gameMap.GetCell(emptX - k, emptY - k) == DefineMove(node))
+			pos.PushForward(emptX - k, emptY - k);
+	}
+}
+
+char gameController::DefineMove(const minMaxNode* node) const
+{
+	if (node->currTurn == 'a')
+		return aiStone;
+	else
+		return playerStone;
+}
+
+/*
+* Метод определяющий итератор фишки
+*/
+unsigned int gameController::DefineIterator(const bool defineAI)
+{
+	if (defineAI)
+	{
+		return DefineIteratorHelper(aiStone);
+	}
+	else
+	{
+		return DefineIteratorHelper(playerStone);
+	}
+}
+
+unsigned int gameController::DefineIteratorHelper(const char stone) const
+{
+	if (stone == 'w')
+		return 1;
+	return 0;
+}
+
+/*
+* Метод определяющий итератор фишки
+*/
+unsigned int gameController::DefineIterator(const minMaxNode* node, 
+	const bool defineAI) const
+{
+	return DefineIteratorHelper(node->currTurn == 'a' ? aiStone : playerStone);
+}
+
+/*
+* Метод определяющий итератор фишки
+*/
+unsigned int gameController::DefineNextMoveIterator(minMaxNode* node)
+{
+	if (node->currTurn == 'a')
+	{
+		if (playerStone == 'w')
+			return 1;
+		return 0;
+	}
+	else
+	{
+		if (aiStone == 'w')
+			return 1;
+		return 0;
+	}
+}
+
+/*
+* Метод определяющий ход игры
+*/
+char gameController::DefineNextMove(minMaxNode* node)
+{
+	if (node->currTurn == 'a')
+		return 'p';
+	return 'a';
+}
+
+/*
+* Метод присуждающий очки за линии 5 в ряд
+*/
+int* gameController::MinMaxUpdate(minMaxNode* node)
+{
+	int* score = nullptr;
+	try
+	{
+		score = new int[5] {0};
+	}
+	catch (const std::exception&)
+	{
+		throw("bad allocation");
+	}
+
+	// Проверка по горизонтали
+	for (int i = 0; i < width; ++i)
+	{
+		line dots;
+		for (int j = 0; j < width - 4; ++j)
+		{
+			bool sequence = true;
+			for (int k = 0; k < 5; ++k)
+			{
+				if (gameMap.GetCell(i, j + k) != DefineMove())
+				{
+					sequence = false;
+					break;
+				}
+				dots.dots[k].SetPoint(i, j + k);
+			}
+
+			if (sequence && 
+				!FindHistoryComb(dots, horizontal, DefineIterator(node, true)))
+			{
+				playersScore[DefineNextMoveIterator(node)]++;
+				score[4]++;
+				score[horizontal]++;
+				playersHistComb[DefineNextMoveIterator(node)]
+					.GetList(horizontal).PushForward(dots);
+			}
+		}
+	}
+
+	// Проверка по вертикали
+	for (int i = 0; i < width - 4; ++i)
+	{
+		line dots;
+		for (int j = 0; j < width; ++j)
+		{
+			bool sequence = true;
+
+			for (int k = 0; k < 5; ++k)
+			{
+				if (gameMap.GetCell(i + k, j) != DefineMove())
+				{
+					sequence = false;
+					break;
+				}
+				dots.dots[k].SetPoint(i + k, j);
+			}
+
+			if (sequence && 
+				!FindHistoryComb(dots, vertical, DefineNextMoveIterator(node)))
+			{
+				playersScore[DefineNextMoveIterator(node)]++;
+				score[4]++;
+				score[vertical]++;
+				playersHistComb[DefineNextMoveIterator(node)]
+					.GetList(vertical).PushForward(dots);
+			}
+		}
+	}
+
+	// Проверка по диагонали (слева направо)
+	for (int i = 0; i < width - 4; ++i)
+	{
+		line dots;
+		for (int j = 0; j < width - 4; ++j)
+		{
+			bool sequence = true;
+			for (int k = 0; k < 5; ++k)
+			{
+				if (gameMap.GetCell(i + k, j + k) != DefineMove())
+				{
+					sequence = false;
+					break;
+				}
+				dots.dots[k].SetPoint(i + k, j + k);
+			}
+
+			if (sequence && 
+				!FindHistoryComb(dots, mainDiagonal, DefineNextMoveIterator(node)))
+			{
+				playersScore[DefineNextMoveIterator(node)]++;
+				score[4]++;
+				score[mainDiagonal]++;
+				playersHistComb[DefineNextMoveIterator(node)]
+					.GetList(mainDiagonal).PushForward(dots);
+			}
+		}
+	}
+
+	// Проверка по диагонали (справа налево)
+	for (int i = 4; i < width; ++i)
+	{
+		line dots;
+		for (int j = 0; j < width - 4; ++j)
+		{
+			bool sequence = true;
+			for (int k = 0; k < 5; ++k)
+			{
+				if (gameMap.GetCell(i - k, j + k) != DefineMove())
+				{
+					sequence = false;
+					break;
+				}
+				dots.dots[k].SetPoint(i - k, j + k);
+			}
+
+			if (sequence && 
+				!FindHistoryComb(dots, sideDiagonal, DefineNextMoveIterator(node)))
+			{
+				playersScore[DefineNextMoveIterator(node)]++;
+				score[4]++;
+				score[sideDiagonal]++;
+				playersHistComb[DefineNextMoveIterator(node)]
+					.GetList(sideDiagonal).PushForward(dots);
+			}
+		}
+	}
+	return score;
+}
+
+/*
+* метод определяющий лучшую позицую для ИИ
+*/
+int gameController::FindBestPosition(listPositions& pos)
+{
+	int val = 1 << 31, index = 0;
+	point dot(pos[0]->GetX(), pos[0]->GetY());
+	gameMap.SetStone(dot.GetX(), dot.GetY(), aiStone);
+
+	val = EvaluateField();
+	gameMap.SetStone(dot.GetX(), dot.GetY(), '0');
+
+	for (auto i = 0; i < pos.GetCountOfElements(); i++)
+	{
+		int tmpVal = 1 << 31;
+		dot.SetPoint(pos[i]->GetX(), pos[i]->GetY());
+		gameMap.SetStone(dot.GetX(), dot.GetY(), aiStone);
+		tmpVal = EvaluateField();
+
+		if (tmpVal > val)
+		{
+			val = tmpVal;
+			index = i;
+		}
+		gameMap.SetStone(dot.GetX(), dot.GetY(), '0');
+	}
+	return index;
+}
+
+/*
+* метод определяющий лучшую позицую для ИИ во 2 части игры
+*/
+int* gameController::FindMoveBestPosition(listPositions& pos)
+{
+	int val = 1 << 31;
+	int* index = new int[4] {0};
+	point dot(pos[0]->GetX(), pos[0]->GetY());
+
+	for (auto k = -1; k < 2; k++)
+	{
+		int tmpVal = 1 << 31;
+		if (gameMap.GetCell(dot.GetX() + k, dot.GetY()) == DefineMove())
+		{
+			gameMap.MoveStone(dot.GetX() + k, dot.GetY(), dot.GetX(), dot.GetY());
+			tmpVal = EvaluateField();
+			gameMap.MoveStone(dot.GetX(), dot.GetY(), dot.GetX() + k, dot.GetY());
+
+			if (tmpVal > val)
+			{
+				val = tmpVal;
+				index[0] = dot.GetX() + k;
+				index[1] = dot.GetY();
+				index[2] = dot.GetX();
+				index[3] = dot.GetY();
+			}
+		}
+
+		if (gameMap.GetCell(dot.GetX(), dot.GetY() + k) == DefineMove())
+		{
+			gameMap.MoveStone(dot.GetX(), dot.GetY() + k, dot.GetX(), dot.GetY());
+			tmpVal = EvaluateField();
+			gameMap.MoveStone(dot.GetX(), dot.GetY(), dot.GetX(), dot.GetY() + k);
+
+			if (tmpVal > val)
+			{
+				val = tmpVal;
+				index[0] = dot.GetX();
+				index[1] = dot.GetY() + k;
+				index[2] = dot.GetX();
+				index[3] = dot.GetY();
+			}
+		}
+
+		if (gameMap.GetCell(dot.GetX() + k, dot.GetY() + k) == DefineMove())
+		{
+			gameMap.MoveStone(dot.GetX() + k, dot.GetY() + k, dot.GetX(), dot.GetY());
+			tmpVal = EvaluateField();
+			gameMap.MoveStone(dot.GetX(), dot.GetY(), dot.GetX() + k, dot.GetY() + k);
+
+			if (tmpVal > val)
+			{
+				val = tmpVal;
+				index[0] = dot.GetX() + k;
+				index[1] = dot.GetY() + k;
+				index[2] = dot.GetX();
+				index[3] = dot.GetY();
+			}
+		}
+
+		if (gameMap.GetCell(dot.GetX() - k, dot.GetY() - k) == DefineMove())
+		{
+			gameMap.MoveStone(dot.GetX() - k, dot.GetY() - k, dot.GetX(), dot.GetY());
+			tmpVal = EvaluateField();
+			gameMap.MoveStone(dot.GetX(), dot.GetY(), dot.GetX() - k, dot.GetY() - k);
+
+			if (tmpVal > val)
+			{
+				val = tmpVal;
+				index[0] = dot.GetX() - k;
+				index[1] = dot.GetY() - k;
+				index[2] = dot.GetX();
+				index[3] = dot.GetY();
+			}
+		}
+	}
+
+	for (auto i = 1; i < pos.GetCountOfElements(); i++)
+	{
+		int tmpVal = 1 << 31;
+		dot.SetPoint(pos[i]->GetX(), pos[i]->GetY());
+		gameMap.SetStone(dot.GetX(), dot.GetY(), aiStone);
+		
+		for (auto k = -1; k < 2; k++)
+		{
+			int tmpVal = 1 << 31;
+			if (gameMap.GetCell(dot.GetX() + k, dot.GetY()) == DefineMove())
+			{
+				gameMap.MoveStone(dot.GetX() + k, dot.GetY(), dot.GetX(), dot.GetY());
+				tmpVal = EvaluateField();
+				gameMap.MoveStone(dot.GetX(), dot.GetY(), dot.GetX() + k, dot.GetY());
+
+				if (tmpVal > val)
+				{
+					val = tmpVal;
+					index[0] = dot.GetX() + k;
+					index[1] = dot.GetY();
+					index[2] = dot.GetX();
+					index[3] = dot.GetY();
+				}
+			}
+
+			if (gameMap.GetCell(dot.GetX(), dot.GetY() + k) == DefineMove())
+			{
+				gameMap.MoveStone(dot.GetX(), dot.GetY() + k, dot.GetX(), dot.GetY());
+				tmpVal = EvaluateField();
+				gameMap.MoveStone(dot.GetX(), dot.GetY(), dot.GetX(), dot.GetY() + k);
+
+				if (tmpVal > val)
+				{
+					val = tmpVal;
+					index[0] = dot.GetX();
+					index[1] = dot.GetY() + k;
+					index[2] = dot.GetX();
+					index[3] = dot.GetY();
+				}
+			}
+
+			if (gameMap.GetCell(dot.GetX() + k, dot.GetY() + k) == DefineMove())
+			{
+				gameMap.MoveStone(dot.GetX() + k, dot.GetY() + k, dot.GetX(), dot.GetY());
+				tmpVal = EvaluateField();
+				gameMap.MoveStone(dot.GetX(), dot.GetY(), dot.GetX() + k, dot.GetY() + k);
+
+				if (tmpVal > val)
+				{
+					val = tmpVal;
+					index[0] = dot.GetX() + k;
+					index[1] = dot.GetY() + k;
+					index[2] = dot.GetX();
+					index[3] = dot.GetY();
+				}
+			}
+
+			if (gameMap.GetCell(dot.GetX() - k, dot.GetY() - k) == DefineMove())
+			{
+				gameMap.MoveStone(dot.GetX() - k, dot.GetY() - k, dot.GetX(), dot.GetY());
+				tmpVal = EvaluateField();
+				gameMap.MoveStone(dot.GetX(), dot.GetY(), dot.GetX() - k, dot.GetY() - k);
+
+				if (tmpVal > val)
+				{
+					val = tmpVal;
+					index[0] = dot.GetX() - k;
+					index[1] = dot.GetY() - k;
+					index[2] = dot.GetX();
+					index[3] = dot.GetY();
+				}
+			}
+		}
+	}
+	return index;
 }
